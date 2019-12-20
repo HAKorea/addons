@@ -112,18 +112,18 @@
       "SCANNING_INTERVAL": "float"
     },
     "KOCOM_LIGHT_SIZE": {
-      "livingroom": "int(1,5)",
-      "bedroom": "int(1,5)",
-      "room1": "int(1,5)",
-      "room2": "int(1,5)",
-      "kitchen": "int(1,5)"
+      "livingroom": "int?",
+      "bedroom": "int?",
+      "room1": "int?",
+      "room2": "int?",
+      "kitchen": "int?"
     },
     "KOCOM_PLUG_SIZE": {
-      "livingroom": "int(1,5)",
-      "bedroom": "int(1,5)",
-      "room1": "int(1,5)",
-      "room2": "int(1,5)",
-      "kitchen": "int(1,5)"
+      "livingroom": "int?",
+      "bedroom": "int?",
+      "room1": "int?",
+      "room2": "int?",
+      "kitchen": "int?"
     },
     "KOCOM_ROOM": {
       "00": "str",
