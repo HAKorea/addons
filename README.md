@@ -138,7 +138,7 @@ fan = true                     // 환기팬
 gas = true                     // 가스 
 elevator = true               // 엘레베이터 
 
-true 혹은 False 대소문자 주의
+true 혹은 false 대소문자 주의
 
 ### Option `Advanced` (required)
 
