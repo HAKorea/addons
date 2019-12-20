@@ -46,13 +46,13 @@ option_file = '/data/options.json'
 if os.path.isfile(option_file):                                                                                                
     with open(option_file) as json_file:                                                                                   
         json_data = json.load(json_file)                                                                               
-        INIT_TEMP = json_data["Advanced"]["INIT_TEMP"]                                                                 
-        SCAN_INTERVAL = json_data["Advanced"]["SCAN_INTERVAL"]                                                         
-        SCANNING_INTERVAL = json_data["Advanced"]["SCANNING_INTERVAL"]                                                 
-        KOCOM_LIGHT_SIZE = json_data["KOCOM_LIGHT_SIZE"]                                                               
-        KOCOM_PLUG_SIZE = json_data["KOCOM_PLUG_SIZE"]                                                                 
-        KOCOM_ROOM = json_data["KOCOM_ROOM"]                                                                           
-        KOCOM_ROOM_THERMOSTAT = json_data["KOCOM_ROOM_THERMOSTAT"]  
+        INIT_TEMP = json_data['Advanced']['INIT_TEMP']                                                                 
+        SCAN_INTERVAL = json_data['Advanced']['SCAN_INTERVAL']                                                         
+        SCANNING_INTERVAL = json_data['Advanced']['SCANNING_INTERVAL']                                                 
+        KOCOM_LIGHT_SIZE = json_data['KOCOM_LIGHT_SIZE']                                                               
+        KOCOM_PLUG_SIZE = json_data['KOCOM_PLUG_SIZE']                                                                 
+        KOCOM_ROOM = json_data['KOCOM_ROOM']                                                                           
+        KOCOM_ROOM_THERMOSTAT = json_data['KOCOM_ROOM_THERMOSTAT']         
 ###############################################################################################################
 
 ###############################################################################################################
