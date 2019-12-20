@@ -11,8 +11,8 @@
 2. Samba로 Hassio가 설치된 곳으로 접속하여 addons 폴더 안에 wallpad 라는 폴더를 만들고 소스코드를 업로드합니다.
 3. 홈어시스턴트의 Hass.io > ADD-ON STORE 오른쪽 상단의 refresh 버튼을 누릅니다.
 4. Local add-ons 에서 "Korean Wallpad Controller with RS485" 클릭합니다.
-5. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
-6. "INSTALL" 버튼을 누르면 애드온이 설치됩니다. 최대 약 10분 정도 소요. 
+5. "INSTALL" 버튼을 누르면 애드온이 설치됩니다. 최대 약 10분 정도 소요. 
+6. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
 7. "START" 버튼으로 애드온을 실행합니다.
 
 ## Configuration
