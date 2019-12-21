@@ -1473,7 +1473,7 @@ if __name__ == '__main__':
     logFileHandler.suffix = "%Y%m%d"
 
     logger.addHandler(logFileHandler)
-    #logger.addHandler(logStreamHandler)
+    logger.addHandler(logStreamHandler)
 
     logging.info('{} 시작'.format(SW_VERSION))
     logger.info('{} 시작'.format(SW_VERSION))
