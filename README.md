@@ -169,40 +169,29 @@ SCANNING_INTERVAL = 0.5 // 상태값 조회 시 패킷전송 간격
 
 ### Option `KOCOM_LIGHT_SIZE` (optional)
  name은 방이름, number는 조명 개수. 본인의 집 수량만큼 추가 가능.
-{
-  "name": "livingroom",
-  "number": 3
-}
+
+{ "name": "livingroom", "number": 3 }
 
 ### Option `KOCOM_PLUG_SIZE` (optional)
 name은 방이름, number는 플러그 개수. 본인의 집 수량만큼 추가 가능.
-{
-  "name": "livingroom",
-  "number": 3
-}
+
+{ "name": "livingroom", "number": 3 }
+
 ### Option `KOCOM_ROOM` (optional)
 방이름을 배열로 개수만큼 추가
-"KOCOM_ROOM": [
-  "livingroom",
-  "bedroom",
-  "room1",
-  "room2",
-  "kitchen"
-]
+
+"KOCOM_ROOM": [ "livingroom", "bedroom", "room1", "room2" "kitchen" ]
 
 방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
 ### Option `KOCOM_ROOM_THERMOSTAT` (required)
-"KOCOM_ROOM_THERMOSTAT": [
-    "livingroom",
-    "bedroom",
-    "room1",
-    "room2"
-  ]
+
+"KOCOM_ROOM_THERMOSTAT": [ "livingroom", "bedroom", "room1", "room2" ]
+
 조명/콘센트와 난방의 방패킷이 달라서 두개로 나뉘어있습니다.
 방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
-월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
+월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
 ## Support
 
