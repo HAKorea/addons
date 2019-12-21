@@ -144,7 +144,7 @@ grex_controller = 그렉스 환기장치의 리모콘(환기모드, 정지 등)
 
 ### Option `MQTT` (required)
 
-anonymous = False           // MQTT 설정
+anonymous = false           // MQTT 설정
 server = 192.168.x.xx         // MQTT 서버
 username = id                 // MQTT ID
 password = pw                // MQTT PW
@@ -185,7 +185,7 @@ name은 방이름, number는 플러그 개수. 본인의 집 수량만큼 추가
 방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
-### Option `KOCOM_ROOM_THERMOSTAT` (required)
+### Option `KOCOM_ROOM_THERMOSTAT` (optional)
 
 "KOCOM_ROOM_THERMOSTAT": [ "livingroom", "bedroom", "room1", "room2" ]
 
@@ -204,7 +204,7 @@ You have several options to get them answered:
 
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
 
-## Version : 0.5.1
+## Version : 0.6
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/zooil/wallpadRS485
