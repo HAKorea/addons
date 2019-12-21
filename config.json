@@ -3,7 +3,13 @@
   "version": "0.5b",
   "slug": "wallpad",
   "description": "Wallpad Controller for Homeassistant",
-  "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
   "url": "https://github.com/zooil/wallpadRS485",
   "startup": "application",
   "boot": "auto",
@@ -41,65 +47,65 @@
     "Advanced": {
       "INIT_TEMP": 22,
       "SCAN_INTERVAL": 300,
-      "SCANNING_INTERVAL": 0.8,
-      "KOCOM_LIGHT_SIZE": [
-        {
-          "name": "livingroom",
-          "number": 3
-        },
-        {
-          "name": "bedroom",
-          "number": 2
-        },
-        {
-          "name": "room1",
-          "number": 2
-        },
-        {
-          "name": "room2",
-          "number": 2
-        },
-        {
-          "name": "kitchen",
-          "number": 3
-        }
-      ],
-      "KOCOM_PLUG_SIZE": [
-        {
-          "name": "livingroom",
-          "number": 3
-        },
-        {
-          "name": "bedroom",
-          "number": 2
-        },
-        {
-          "name": "room1",
-          "number": 2
-        },
-        {
-          "name": "room2",
-          "number": 2
-        },
-        {
-          "name": "kitchen",
-          "number": 3
-        }
-      ],
-      "KOCOM_ROOM": [
-        "livingroom",
-        "bedroom",
-        "room1",
-        "room2",
-        "kitchen"
-      ],
-      "KOCOM_ROOM_THERMOSTAT": [
-        "livingroom",
-        "bedroom",
-        "room1",
-        "room2"
-      ]
-    }
+      "SCANNING_INTERVAL": 0.8
+    },
+    "KOCOM_LIGHT_SIZE": [
+      {
+        "name": "livingroom",
+        "number": 3
+      },
+      {
+        "name": "bedroom",
+        "number": 2
+      },
+      {
+        "name": "room1",
+        "number": 2
+      },
+      {
+        "name": "room2",
+        "number": 2
+      },
+      {
+        "name": "kitchen",
+        "number": 3
+      }
+    ],
+    "KOCOM_PLUG_SIZE": [
+      {
+        "name": "livingroom",
+        "number": 3
+      },
+      {
+        "name": "bedroom",
+        "number": 2
+      },
+      {
+        "name": "room1",
+        "number": 2
+      },
+      {
+        "name": "room2",
+        "number": 2
+      },
+      {
+        "name": "kitchen",
+        "number": 3
+      }
+    ],
+    "KOCOM_ROOM": [
+      "livingroom",
+      "bedroom",
+      "room1",
+      "room2",
+      "kitchen"
+    ],
+    "KOCOM_ROOM_THERMOSTAT": [
+      "livingroom",
+      "bedroom",
+      "room1",
+      "room2"
+    ]
   },
   "schema": {
     "RS485": {
@@ -136,28 +142,28 @@
       "gas": "bool",
       "elevator": "bool"
     },
-	"Advanced": {
+    "Advanced": {
       "INIT_TEMP": "int(10,30)",
       "SCAN_INTERVAL": "int(100,1000)",
-      "SCANNING_INTERVAL": "float",
-      "KOCOM_LIGHT_SIZE": [
-        {
-          "name": "str?",
-          "number": "int?"
-        }
-      ],
-      "KOCOM_PLUG_SIZE": [
-        {
-          "name": "str?",
-          "number": "int?"
-        }
-      ],
-      "KOCOM_ROOM": [
-        "str?"
-      ],
-      "KOCOM_ROOM_THERMOSTAT": [
-        "str?"
-      ]
-    }
+      "SCANNING_INTERVAL": "float"
+    },
+    "KOCOM_LIGHT_SIZE": [
+      {
+        "name": "str?",
+        "number": "int?"
+      }
+    ],
+    "KOCOM_PLUG_SIZE": [
+      {
+        "name": "str?",
+        "number": "int?"
+      }
+    ],
+    "KOCOM_ROOM": [
+      "str?"
+    ],
+    "KOCOM_ROOM_THERMOSTAT": [
+      "str?"
+    ]
   }
 }
