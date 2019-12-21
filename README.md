@@ -216,7 +216,7 @@ You have several options to get them answered:
 
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
 
-## Version : 0.4b
+## Version : 0.5.1
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/zooil/wallpadRS485
