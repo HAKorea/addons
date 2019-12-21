@@ -5,9 +5,7 @@ FROM $BUILD_FROM
 ENV LANG C.UTF-8
 
 # Copy data for add-on
-COPY run.sh /
-COPY makeconf.sh /
-COPY rs485.py /
+COPY run.sh makeconf.sh rs485.py /
 
 # Install requirements for add-on
 RUN apk add --no-cache jq
