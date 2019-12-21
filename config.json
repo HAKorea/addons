@@ -41,34 +41,64 @@
     "Advanced": {
       "INIT_TEMP": 22,
       "SCAN_INTERVAL": 300,
-      "SCANNING_INTERVAL": 0.8
-    },
-    "KOCOM_LIGHT_SIZE": {
-      "livingroom": 3,
-      "bedroom": 2,
-      "room1": 2,
-      "room2": 2,
-      "kitchen": 3
-    },
-    "KOCOM_PLUG_SIZE": {
-      "livingroom": 2,
-      "bedroom": 2,
-      "room1": 2,
-      "room2": 2,
-      "kitchen": 2
-    },
-    "KOCOM_ROOM": {
-      "00": "livingroom",
-      "01": "bedroom",
-      "02": "room1",
-      "03": "room2",
-      "04": "kitchen"
-    },
-    "KOCOM_ROOM_THERMOSTAT": {
-      "00": "livingroom",
-      "01": "bedroom",
-      "02": "room1",
-      "03": "room2"
+      "SCANNING_INTERVAL": 0.8,
+      "KOCOM_LIGHT_SIZE": [
+        {
+          "name": "livingroom",
+          "number": 3
+        },
+        {
+          "name": "bedroom",
+          "number": 2
+        },
+        {
+          "name": "room1",
+          "number": 2
+        },
+        {
+          "name": "room2",
+          "number": 2
+        },
+        {
+          "name": "kitchen",
+          "number": 3
+        }
+      ],
+      "KOCOM_PLUG_SIZE": [
+        {
+          "name": "livingroom",
+          "number": 3
+        },
+        {
+          "name": "bedroom",
+          "number": 2
+        },
+        {
+          "name": "room1",
+          "number": 2
+        },
+        {
+          "name": "room2",
+          "number": 2
+        },
+        {
+          "name": "kitchen",
+          "number": 3
+        }
+      ],
+      "KOCOM_ROOM": [
+        "livingroom",
+        "bedroom",
+        "room1",
+        "room2",
+        "kitchen"
+      ],
+      "KOCOM_ROOM_THERMOSTAT": [
+        "livingroom",
+        "bedroom",
+        "room1",
+        "room2"
+      ]
     }
   },
   "schema": {
@@ -106,37 +136,28 @@
       "gas": "bool",
       "elevator": "bool"
     },
-    "Advanced": {
+	"Advanced": {
       "INIT_TEMP": "int(10,30)",
       "SCAN_INTERVAL": "int(100,1000)",
-      "SCANNING_INTERVAL": "float"
-    },
-    "KOCOM_LIGHT_SIZE": {
-      "livingroom": "int?",
-      "bedroom": "int?",
-      "room1": "int?",
-      "room2": "int?",
-      "kitchen": "int?"
-    },
-    "KOCOM_PLUG_SIZE": {
-      "livingroom": "int?",
-      "bedroom": "int?",
-      "room1": "int?",
-      "room2": "int?",
-      "kitchen": "int?"
-    },
-    "KOCOM_ROOM": {
-      "00": "str",
-      "01": "str",
-      "02": "str",
-      "03": "str",
-      "04": "str"
-    },
-    "KOCOM_ROOM_THERMOSTAT": {
-      "00": "str",
-      "01": "str",
-      "02": "str",
-      "03": "str"
+      "SCANNING_INTERVAL": "float",
+      "KOCOM_LIGHT_SIZE": [
+        {
+          "name": "str?",
+          "number": "int?"
+        }
+      ],
+      "KOCOM_PLUG_SIZE": [
+        {
+          "name": "str?",
+          "number": "int?"
+        }
+      ],
+      "KOCOM_ROOM": [
+        "str?"
+      ],
+      "KOCOM_ROOM_THERMOSTAT": [
+        "str?"
+      ]
     }
   }
 }
