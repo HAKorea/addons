@@ -49,7 +49,8 @@ if os.path.isfile(option_file):
         json_data = json.load(json_file)                                                                               
         INIT_TEMP = json_data['Advanced']['INIT_TEMP']                                                                 
         SCAN_INTERVAL = json_data['Advanced']['SCAN_INTERVAL']                                                         
-        SCANNING_INTERVAL = json_data['Advanced']['SCANNING_INTERVAL']                                                 
+        SCANNING_INTERVAL = json_data['Advanced']['SCANNING_INTERVAL'] 
+        CONF_LOGLEVEL = json_data['Advanced']['LOGLEVEL']
         KOCOM_LIGHT_SIZE = {} 
         dict_data = json_data['KOCOM_LIGHT_SIZE']                                                               
         for i in dict_data:

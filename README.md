@@ -163,9 +163,10 @@ true 혹은 false 대소문자 주의
 
 ### Option `Advanced` (required)
 
-INIT_TEMP = 22 // 보일러 초기값
-SCAN_INTERVAL = 300 // 월패드의 상태값 조회 간격
-SCANNING_INTERVAL = 0.5 // 상태값 조회 시 패킷전송 간격
+INIT_TEMP : 22 // 보일러 초기값
+SCAN_INTERVAL : 300 // 월패드의 상태값 조회 간격
+SCANNING_INTERVAL : 0.5 // 상태값 조회 시 패킷전송 간격
+LOGLEVEL : info , debug, info, warn
 
 ### Option `KOCOM_LIGHT_SIZE` (optional)
  name은 방이름, number는 조명 개수. 본인의 집 수량만큼 추가 가능.

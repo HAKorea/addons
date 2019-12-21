@@ -47,7 +47,8 @@
     "Advanced": {
       "INIT_TEMP": 22,
       "SCAN_INTERVAL": 300,
-      "SCANNING_INTERVAL": 0.8
+      "SCANNING_INTERVAL": 0.8,
+      "LOGLEVEL" : "info"
     },
     "KOCOM_LIGHT_SIZE": [
       {
@@ -145,7 +146,8 @@
     "Advanced": {
       "INIT_TEMP": "int(10,30)",
       "SCAN_INTERVAL": "int(100,1000)",
-      "SCANNING_INTERVAL": "float"
+      "SCANNING_INTERVAL": "float",
+      "LOGLEVEL" : "str"
     },
     "KOCOM_LIGHT_SIZE": [
       {
