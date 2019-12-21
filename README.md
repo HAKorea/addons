@@ -52,37 +52,59 @@ Add-on configuration:
     "elevator": false
   },
   "Advanced": {
-    "INIT_TEMP": 22, 
+    "INIT_TEMP": 22,
     "SCAN_INTERVAL": 300,
     "SCANNING_INTERVAL": 0.8
   },
-  "KOCOM_LIGHT_SIZE": {
-    "livingroom": 3,
-    "bedroom": 2,
-    "room1": 2,
-    "room2": 2,
-    "kitchen": 3
-  },
-  "KOCOM_PLUG_SIZE": {
-    "livingroom": 2,
-    "bedroom": 2,
-    "room1": 2,
-    "room2": 2,
-    "kitchen": 2
-  },
-  "KOCOM_ROOM": {
-    "00": "livingroom",
-    "01": "bedroom",
-    "02": "room1",
-    "03": "room2",
-    "04": "kitchen"
-  },
-  "KOCOM_ROOM_THERMOSTAT": {
-    "00": "livingroom",
-    "01": "bedroom",
-    "02": "room1",
-    "03": "room2"
-  }
+  "KOCOM_LIGHT_SIZE": [
+    {
+      "name": "livingroom",
+      "number": 3
+    },
+    {
+      "name": "bedroom",
+      "number": 2
+    },
+    {
+      "name": "room",
+      "number": 2
+    }
+    {
+      "name": "kitchen",
+      "number": 3
+    }
+  ],
+  "KOCOM_PLUG_SIZE": [
+    {
+      "name": "livingroom",
+      "number": 3
+    },
+    {
+      "name": "bedroom",
+      "number": 2
+    },
+    {
+      "name": "room",
+      "number": 2
+    },
+    {
+      "name": "kitchen",
+      "number": 3
+    }
+  ],
+  "KOCOM_ROOM": [
+    "livingroom",
+    "bedroom",
+    "room1",
+    "room2",
+    "kitchen"
+  ],
+  "KOCOM_ROOM_THERMOSTAT": [
+    "livingroom",
+    "bedroom",
+    "room1",
+    "room2"
+  ]
 }
 ```
 
@@ -146,24 +168,42 @@ INIT_TEMP = 22 // 보일러 초기값
 SCAN_INTERVAL = 300 // 월패드의 상태값 조회 간격
 SCANNING_INTERVAL = 0.5 // 상태값 조회 시 패킷전송 간격
 
-### Option `KOCOM_LIGHT_SIZE` (required)
-조명 갯수
-KOCOM_LIGHT_SIZE            = {"livingroom": 3, "bedroom": 2, "room1": 2, "room2": 2, "kitchen": 3}
+### Option `KOCOM_LIGHT_SIZE` (optional)
+ name은 방이름, number는 조명 개수. 본인의 집 수량만큼 추가 가능.
+{
+  "name": "livingroom",
+  "number": 3
+}
 
-### Option `KOCOM_PLUG_SIZE` (required)
-플러그 갯수
-KOCOM_PLUG_SIZE             = {"livingroom": 2, "bedroom": 2, "room1": 2, "room2": 2, "kitchen": 2}
+### Option `KOCOM_PLUG_SIZE` (optional)
+name은 방이름, number는 플러그 개수. 본인의 집 수량만큼 추가 가능.
+{
+  "name": "livingroom",
+  "number": 3
+}
+### Option `KOCOM_ROOM` (optional)
+방이름을 배열로 개수만큼 추가
+"KOCOM_ROOM": [
+  "livingroom",
+  "bedroom",
+  "room1",
+  "room2",
+  "kitchen"
+]
 
-### Option `KOCOM_ROOM` (required)
-방이름
-KOCOM_ROOM                  = {"00": "livingroom", "01": "bedroom", "02": "room1", "03": "room2", "04": "kitchen"}
-
-방 패킷에 따른 방이름 (패킷1: 방이름1, 패킷2: 방이름2 . . .)
+방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
 ### Option `KOCOM_ROOM_THERMOSTAT` (required)
-KOCOM_ROOM_THERMOSTAT       = {"00": "livingroom", "01": "bedroom", "02": "room1", "03": "room2"}
+"KOCOM_ROOM_THERMOSTAT": [
+    "livingroom",
+    "bedroom",
+    "room1",
+    "room2"
+  ]
 조명/콘센트와 난방의 방패킷이 달라서 두개로 나뉘어있습니다.
+방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
+월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
 ## Support
 

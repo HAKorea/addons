@@ -1,6 +1,6 @@
 {
   "name": "Korean Wallpad Controller with RS485",
-  "version": "0.5b",
+  "version": "0.5.1",
   "slug": "wallpad",
   "description": "Wallpad Controller for Homeassistant",
   "arch": [
