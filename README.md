@@ -110,12 +110,12 @@ Add-on configuration:
 
 ### Option: `RS485` (required)
 
-type = Serial                    // serial 혹은 socket
+type = Serial                    // Serial 혹은 Socket
 
 ### Option: `Socket` (required)
 
-server = 192.168.x.x           // socket 쓸 경우 socket IP주소
-port = xx                        // socket 쓸 경우 socket PORT
+server = 192.168.x.x           // Socket 쓸 경우 socket IP주소
+port = xx                        // Socket 쓸 경우 socket PORT
 
 ### Option: `SocketDevice` (required)
 
