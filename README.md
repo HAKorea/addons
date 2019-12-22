@@ -4,6 +4,9 @@
 
 ## About
 랜이님이 만든 월패드 프로그램을 애드온으로 만든 것입니다.
+Modified and rebuilt by zooil
+
+## Version : 0.6.1
 
 ## Installation
 
@@ -205,7 +208,6 @@ You have several options to get them answered:
 
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
 
-## Version : 0.6
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/zooil/wallpadRS485
