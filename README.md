@@ -13,9 +13,11 @@ Modified and rebuilt by zooil
 1. 홈어시스턴트의 Hass.io > ADD-ON STORE에서 Add new repository by URL에 https://github.com/zooil/wallpadRS485 를 입력한 다음 ADD 버튼을 누릅니다.
 2. ADD-ON STORE 페이지 하단에서 "Korean Wallpad Controller with RS485" 클릭합니다.
 3. "INSTALL" 버튼을 누르면 애드온이 설치됩니다. 최대 약 10분 정도 소요. 
-4. INSTALL 버튼이 종료되고 REBUILD, START 버튼이 나타나지 않더라도 5분 정도 기다립니다. 시스템에 따라서 바로 안나타나는 경우가 있는데 페이지를 리프레시하면 설치가 완료됩니다. INSTALL 버튼을 여러번 누르지 마세요!
-6. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
-7. "START" 버튼으로 애드온을 실행합니다.
+4. INSTALL 버튼위에 설치 애니메이션이 동작하는데 이것이 멈추더라도 REBUILD, START 버튼이 나타나지 않는 경우가 있습니다.
+5. 이 애드온은 이미지를 내려받는 것이 아니라 직접 여러분의 Hassio에서 이미지를 만듭니다. 따라서 컴퓨터성능과 인터넷 속도에 따라서 시간이 좀 걸립니다. 
+6. INSTALL 버튼을 누른다음 설치 애니메이션이 실행되면 제대로 설치중인 것입니다. INSTALL을 여러번 누르지 마시고 브라우저 페이지를 리프리시 하세요. 
+7. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
+8. "START" 버튼으로 애드온을 실행합니다.
 
 ## Configuration
 
