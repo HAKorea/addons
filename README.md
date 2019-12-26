@@ -5,7 +5,7 @@
 ## About
 랜이님이 만든 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 0.6.1
+## Version : 0.6.2
 
 ## Installation
 
