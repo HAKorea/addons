@@ -13,3 +13,6 @@
  ### Webcam Video Capture with Motion Server (motion4hassio)
 
  웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
+
+### 문의
+네이버카페 : https://cafe.naver.com/koreassistant
