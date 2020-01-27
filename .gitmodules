@@ -1,3 +1,9 @@
 [submodule "wallpadRS485"]
 	path = wallpadRS485
 	url = https://github.com/zooil/wallpadRS485
+[submodule "owntracks4hassio"]
+	path = owntracks4hassio
+	url = https://github.com/zooil/owntracks4hassio
+[submodule "motion4hassio"]
+	path = motion4hassio
+	url = https://github.com/zooil/motion4hassio
