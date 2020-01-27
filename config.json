@@ -1,0 +1,38 @@
+{
+  "name": "Owntracks Recorder",
+  "version": "0.7",
+  "slug": "owntracks",
+  "description": "Owntracks Recorder for Hassio",
+  "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
+  "url": "https://github.com/zooil/lab404",
+  "startup": "application",
+  "boot": "auto",
+  "ingress": true,
+  "ingress_entry": "/",
+  "ingress_port": 8083,
+  "panel_icon": "mdi:map-clock",
+  "panel_title": "OwntracksREC",
+  "options": {
+      "localHost": "0.0.0.0",
+      "mqttServer": "core-mosquitto",
+      "mqttPort": 1883,
+      "mqttUser": "username",
+      "mqttPassword": "password",
+      "topic": "owntracks/#"
+  },
+  "schema": {
+      "localHost": "str",
+      "mqttServer": "str",
+      "mqttPort": "int",
+      "mqttUser": "str?",
+      "mqttPassword": "str?",
+      "topic": "str"
+  },
+  "ports": {
+    "8083/tcp": 8083
+  }, 
+  "ports_description": {
+    "8083/tcp": "Owntracks WebUI Port"
+  },
+  "webui": "http://[HOST]:[PORT:8083]"
+}
