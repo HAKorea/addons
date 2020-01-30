@@ -7,3 +7,6 @@
 [submodule "motion4hassio"]
 	path = motion4hassio
 	url = https://github.com/zooil/motion4hassio
+[submodule "commaxRS485"]
+	path = commaxRS485
+	url = https://github.com/zooil/commaxRS485
