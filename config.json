@@ -1,8 +1,8 @@
 {
-  "name": "Korean Wallpad Controller with RS485",
+  "name": "Kocom Wallpad Controller with RS485",
   "version": "0.6.2",
   "slug": "wallpad",
-  "description": "Wallpad Controller for Homeassistant",
+  "description": " KocomWallpad Controller for Homeassistant",
   "arch": [
     "armhf",
     "armv7",
