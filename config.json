@@ -1,0 +1,33 @@
+{
+  "name": "Commax Wallpad Controller with RS485",
+  "version": "0.1",
+  "slug": "commax_wallpad",
+  "description": "Commax Wallpad Controller for Hassio",
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
+  "url": "https://github.com/HAKorea/addons",
+  "startup": "application",
+  "boot": "auto",
+  "auto_uart": true,
+  "options": {
+    "serialport":"/dev/ttyUSB0",
+    "MQTT": {
+      "server": "192.168.x.x",
+      "username": "id",
+      "password": "pw"
+    }
+  },
+  "schema": {
+    "serialport":"str",
+    "MQTT": {
+      "server": "str",
+      "username": "str",
+      "password": "str"
+    }
+  }
+}
