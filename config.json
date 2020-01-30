@@ -1,6 +1,6 @@
 {
   "name": "Commax Wallpad Controller with RS485",
-  "version": "0.1",
+  "version": "0.2",
   "slug": "commax_wallpad",
   "description": "Commax Wallpad Controller for Hassio",
   "arch": [
@@ -20,7 +20,8 @@
       "server": "192.168.x.x",
       "username": "id",
       "password": "pw"
-    }
+    },
+    "reset":false
   },
   "schema": {
     "serialport":"str",
@@ -28,6 +29,7 @@
       "server": "str",
       "username": "str",
       "password": "str"
-    }
+    },
+    "reset":"bool"
   }
 }

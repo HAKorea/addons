@@ -20,6 +20,7 @@
 
 만일 commax_homegateway.js 파일을 수정하시려면 한번 실행한 후 애드온을 Stop 하시고 addons/data/#####commax_wallpad/ 폴더에 있는 파일을 알맞게 수정하신 다음 애드온을 Start 하시면 이후부터는 수정된 파일을 적용합니다. #####는 일정한 숫자로된 폴더입니다.
 
+
 ## Configuration
 
 Add-on configuration:
@@ -44,6 +45,12 @@ Add-on configuration:
 server = "192.168.x.xx"         // MQTT 서버
 username = "id"                 // MQTT ID
 password = "pw"                // MQTT PW
+
+
+### Option: `reset` (required)
+
+"reset" = false // true로 설정하면 js파일을 수정하여도 원본으로 초기화됨.
+ture 경우 아래 로그창에 Initializing... 이라고 표시. false는 Skip...
 
 ## Support
 
