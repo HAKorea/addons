@@ -1,6 +1,6 @@
 {
   "name": "USB Video Connector Addon",
-  "version": "0.5.9",
+  "version": "1.0",
   "slug": "motion",
   "description": "Using WebCam or USB Video Capture Dongle with Motion Server",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
