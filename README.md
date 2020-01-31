@@ -5,7 +5,7 @@
 ## About
 그레고리 하우스님이 만든 nodejs 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 0.3
+## Version : 0.9
 
 ## Installation
 

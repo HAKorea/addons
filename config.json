@@ -1,6 +1,6 @@
 {
   "name": "Commax Wallpad Controller with RS485",
-  "version": "0.3",
+  "version": "0.9",
   "slug": "commax_wallpad",
   "description": "Commax Wallpad Controller for Hassio",
   "arch": [
