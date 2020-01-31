@@ -1,6 +1,6 @@
 {
   "name": "Owntracks Recorder",
-  "version": "0.7",
+  "version": "0.7.1",
   "slug": "owntracks",
   "description": "Owntracks Recorder for Hassio",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],

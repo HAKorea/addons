@@ -1,6 +1,6 @@
 # OwntracksREC
 
-## About ver 0.7
+## About ver 0.7.1
 Owntracks Recorder Addon for Hassio
 
 ## Configuration
