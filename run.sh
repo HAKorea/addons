@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SHARE_DIR=/share/kocom_wallpad
+SHARE_DIR=/share/kocom
 
 if [ ! -f $SHARE_DIR/rs485.py ]; then
 	mkdir $SHARE_DIR
