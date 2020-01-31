@@ -34,7 +34,8 @@ Add-on configuration:
     "server": "192.168.x.x",
     "username": "id",
     "password": "pw"
-  }
+  },
+  "reset": true
 }
 ```
 
@@ -69,7 +70,7 @@ You have several options to get them answered:
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/HAKorea/addons
-[issue]: https://github.com/zooil/wallpadRS485/issues
+[issue]: https://github.com/zooil/commaxRS485/issues
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
