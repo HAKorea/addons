@@ -5,7 +5,7 @@
 ## About
 랜이님이 만든 코콤 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 0.7.1
+## Version : 1.0.3
 
 ## Installation
 
@@ -59,7 +59,9 @@ Add-on configuration:
   "Advanced": {
     "INIT_TEMP": 22,
     "SCAN_INTERVAL": 300,
-    "SCANNING_INTERVAL": 0.8
+    "SCANNING_INTERVAL": 0.8,
+    "DEFAULT_SPEED" : "medium",
+    "LOGLEVEL" : "info"
   },
   "KOCOM_LIGHT_SIZE": [
     {
@@ -172,6 +174,7 @@ true 혹은 false 대소문자 주의
 INIT_TEMP : 22 // 보일러 초기값
 SCAN_INTERVAL : 300 // 월패드의 상태값 조회 간격
 SCANNING_INTERVAL : 0.5 // 상태값 조회 시 패킷전송 간격
+DEFAULT_SPEED: medium //환풍기 초기속도 ['low', 'medium', 'high']
 LOGLEVEL : info , debug, info, warn
 
 ### Option `KOCOM_LIGHT_SIZE` (optional)

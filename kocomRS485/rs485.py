@@ -4,6 +4,7 @@ python -m pip install pyserial
 python -m pip install paho-mqtt
 '''
 import os
+import os.path
 import serial
 import socket
 import time
@@ -18,7 +19,7 @@ import paho.mqtt.client as mqtt
 from collections import OrderedDict
 
 # Version
-SW_VERSION = 'RS485 Compilation 1.0.2b'
+SW_VERSION = 'RS485 Compilation 1.0.3b'
 # Log Level
 CONF_LOGLEVEL = 'info' # debug, info, warn
 
@@ -28,6 +29,8 @@ CONF_LOGLEVEL = 'info' # debug, info, warn
 
 # 보일러 초기값
 INIT_TEMP = 22
+# 환풍기 초기속도 ['low', 'medium', 'high']
+DEFAULT_SPEED = 'medium'
 # 조명 / 플러그 갯수
 KOCOM_LIGHT_SIZE            = {'livingroom': 3, 'bedroom': 2, 'room1': 2, 'room2': 2, 'kitchen': 3}
 KOCOM_PLUG_SIZE             = {'livingroom': 2, 'bedroom': 2, 'room1': 2, 'room2': 2, 'kitchen': 2}
@@ -35,13 +38,12 @@ KOCOM_PLUG_SIZE             = {'livingroom': 2, 'bedroom': 2, 'room1': 2, 'room2
 # 방 패킷에 따른 방이름 (패킷1: 방이름1, 패킷2: 방이름2 . . .)
 # 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
 # 조명/콘센트와 난방의 방패킷이 달라서 두개로 나뉘어있습니다.
-KOCOM_ROOM                  = {'00': 'livingroom', '01': 'bedroom', '02': 'room1', '03': 'room2', '04': 'kitchen'}
+KOCOM_ROOM                  = {'00': 'livingroom', '01': 'bedroom', '02': 'room2', '03': 'room1', '04': 'kitchen'}
 KOCOM_ROOM_THERMOSTAT       = {'00': 'livingroom', '01': 'bedroom', '02': 'room1', '03': 'room2'}
 
 # TIME 변수(초)
 SCAN_INTERVAL = 300         # 월패드의 상태값 조회 간격
 SCANNING_INTERVAL = 0.8     # 상태값 조회 시 패킷전송 간격
-
 ####################### Start Here by Zooil ###########################
 option_file = '/data/options.json'                                                                                             
 if os.path.isfile(option_file):                                                                                                
@@ -50,6 +52,7 @@ if os.path.isfile(option_file):
         INIT_TEMP = json_data['Advanced']['INIT_TEMP']                                                                 
         SCAN_INTERVAL = json_data['Advanced']['SCAN_INTERVAL']                                                         
         SCANNING_INTERVAL = json_data['Advanced']['SCANNING_INTERVAL'] 
+        DEFAULT_SPEED = json_data['Advanced']['DEFAULT_SPEED'] 
         CONF_LOGLEVEL = json_data['Advanced']['LOGLEVEL']
         KOCOM_LIGHT_SIZE = {} 
         dict_data = json_data['KOCOM_LIGHT_SIZE']                                                               
@@ -79,7 +82,7 @@ if os.path.isfile(option_file):
                 num_key = "%d" % (num)
             KOCOM_ROOM_THERMOSTAT[num_key] = i
             num += 1         
-####################### End Here by Zooil ###########################            
+####################### End Here by Zooil ########################### 
 ###############################################################################################################
 
 ###############################################################################################################
@@ -138,6 +141,16 @@ CONF_SERIAL_DEVICE = 'SerialDevice'
 CONF_SOCKET = 'Socket'
 CONF_SOCKET_DEVICE = 'SocketDevice'
 
+# Log 폴더 생성 (도커 실행 시 로그폴더 매핑)
+def make_folder(folder_name):
+    if not os.path.isdir(folder_name):
+        os.mkdir(folder_name)
+root_dir = str(os.path.dirname(os.path.realpath(__file__)))
+log_dir = root_dir + '/log/'
+make_folder(log_dir)
+conf_path = str(root_dir + '/'+ CONF_FILE)
+log_path = str(log_dir + '/' + CONF_LOGFILE)
+
 class rs485:
     def __init__(self):
         self._mqtt_config = {}
@@ -147,7 +160,7 @@ class rs485:
         self.type = None
 
         config = configparser.ConfigParser()
-        config.read(CONF_FILE)
+        config.read(conf_path)
 
         get_conf_wallpad = config.items(CONF_WALLPAD)
         for item in get_conf_wallpad:
@@ -255,7 +268,7 @@ class rs485:
         soc = socket.socket()
         soc.settimeout(10)
         try:
-            soc.connect((server, port))
+            soc.connect((server, int(port)))
         except Exception as e:
             logger.info('소켓에 연결할 수 없습니다.[{}][{}:{}]'.format(e, server, port))
             return False
@@ -263,68 +276,83 @@ class rs485:
         return soc
 
 class Kocom(rs485):
-    def __init__(self, client, name, packet_device, packet_len):
+    def __init__(self, client, name, device, packet_len):
         self.client = client
         self._name = name
+        self.connected = True
 
         self.ha_registry = False
         self.kocom_scan = True
+        self.scan_packet_buf = []
 
         self.tick = time.time()
         self.wp_list = {}
-        for d_name in KOCOM_DEVICE.values():
-            if d_name == DEVICE_ELEVATOR or d_name == DEVICE_GAS:
-                self.wp_list[d_name] = {}
-                self.wp_list[d_name][DEVICE_WALLPAD] = {}
-                self.wp_list[d_name][DEVICE_WALLPAD][d_name] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-            elif d_name == DEVICE_FAN:
-                self.wp_list[d_name] = {}
-                self.wp_list[d_name][DEVICE_WALLPAD] = {}
-                self.wp_list[d_name][DEVICE_WALLPAD]['mode'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-                self.wp_list[d_name][DEVICE_WALLPAD]['speed'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-            elif d_name == DEVICE_THERMOSTAT:
-                self.wp_list[d_name] = {}
-                for r_name in KOCOM_ROOM_THERMOSTAT.values():
-                    self.wp_list[d_name][r_name] = {}
-                    self.wp_list[d_name][r_name]['mode'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-                    self.wp_list[d_name][r_name]['current_temp'] = {'state': 0, 'set': 0, 'last': 'state', 'count': 0}
-                    self.wp_list[d_name][r_name]['target_temp'] = {'state': INIT_TEMP, 'set': INIT_TEMP, 'last': 'state', 'count': 0}
-            elif d_name == DEVICE_LIGHT or d_name == DEVICE_PLUG:
-                self.wp_list[d_name] = {}
-                for r_name in KOCOM_ROOM.values():
-                    self.wp_list[d_name][r_name] = {}
-                    if d_name == DEVICE_LIGHT:
-                        for i in range(0, KOCOM_LIGHT_SIZE[r_name] + 1):
-                            self.wp_list[d_name][r_name][d_name + str(i)] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-                    if d_name == DEVICE_PLUG:
-                        for i in range(0, KOCOM_PLUG_SIZE[r_name] + 1):
-                            self.wp_list[d_name][r_name][d_name + str(i)] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
-
-        self.d_type = client._type
-        self.d_serial = packet_device
-        self.d_mqtt = self.connect_mqtt(self.client._mqtt, name)
         self.wp_light = self.client._wp_light
         self.wp_fan = self.client._wp_fan
         self.wp_plug = self.client._wp_plug
         self.wp_gas = self.client._wp_gas
         self.wp_elevator = self.client._wp_elevator
         self.wp_thermostat = self.client._wp_thermostat
+        for d_name in KOCOM_DEVICE.values():
+            if d_name == DEVICE_ELEVATOR or d_name == DEVICE_GAS:
+                self.wp_list[d_name] = {}
+                self.wp_list[d_name][DEVICE_WALLPAD] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                self.wp_list[d_name][DEVICE_WALLPAD][d_name] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
+            elif d_name == DEVICE_FAN:
+                self.wp_list[d_name] = {}
+                self.wp_list[d_name][DEVICE_WALLPAD] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                self.wp_list[d_name][DEVICE_WALLPAD]['mode'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
+                self.wp_list[d_name][DEVICE_WALLPAD]['speed'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
+            elif d_name == DEVICE_THERMOSTAT:
+                self.wp_list[d_name] = {}
+                for r_name in KOCOM_ROOM_THERMOSTAT.values():
+                    self.wp_list[d_name][r_name] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                    self.wp_list[d_name][r_name]['mode'] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
+                    self.wp_list[d_name][r_name]['current_temp'] = {'state': 0, 'set': 0, 'last': 'state', 'count': 0}
+                    self.wp_list[d_name][r_name]['target_temp'] = {'state': INIT_TEMP, 'set': INIT_TEMP, 'last': 'state', 'count': 0}
+            elif d_name == DEVICE_LIGHT or d_name == DEVICE_PLUG:
+                self.wp_list[d_name] = {}
+                for r_name in KOCOM_ROOM.values():
+                    self.wp_list[d_name][r_name] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                    if d_name == DEVICE_LIGHT:
+                        for i in range(0, KOCOM_LIGHT_SIZE[r_name] + 1):
+                            self.wp_list[d_name][r_name][d_name + str(i)] = {'state': 'off', 'set': 'off', 'last': 'state', 'count': 0}
+                    if d_name == DEVICE_PLUG:
+                        for i in range(0, KOCOM_PLUG_SIZE[r_name] + 1):
+                            self.wp_list[d_name][r_name][d_name + str(i)] = {'state': 'on', 'set': 'on', 'last': 'state', 'count': 0}
 
-        _t1 = threading.Thread(target=self.get_serial, args=(name, packet_len))
-        _t1.start()
-        _t2 = threading.Thread(target=self.scan_list)
-        _t2.start()
+        self.d_type = client._type
+        if self.d_type == "serial":
+            self.d_serial = client._connect[device]
+        elif self.d_type == "socket":
+            self.d_serial = client._connect
+        self.d_mqtt = self.connect_mqtt(self.client._mqtt, name)
+
+        self._t1 = threading.Thread(target=self.get_serial, args=(name, packet_len))
+        self._t1.start()
+        self._t2 = threading.Thread(target=self.scan_list)
+        self._t2.start()
+
+    def connection_lost(self):
+        self._t1.join()
+        self._t2.join()
+        if not self.connected:
+            logger.debug('[ERROR] 서버 연결이 끊어져 kocom 클래스를 종료합니다.')
+            return False
 
     def read(self):
         if self.client._connect == False:
             return ''
-        if self.d_type == 'serial':
-            if self.d_serial.readable():
-                return self.d_serial.read()
-            else:
-                return ''
-        elif self.d_type == 'socket':
-            return self.d_serial.recv(1)
+        try:
+            if self.d_type == 'serial':
+                if self.d_serial.readable():
+                    return self.d_serial.read()
+                else:
+                    return ''
+            elif self.d_type == 'socket':
+                return self.d_serial.recv(1)
+        except:
+            logging.info('[Serial Read] Connection Error')
 
     def write(self, data):
         if data == False:
@@ -332,10 +360,13 @@ class Kocom(rs485):
         self.tick = time.time()
         if self.client._connect == False:
             return
-        if self.d_type == 'serial':
-            return self.d_serial.write(bytearray.fromhex((data)))
-        elif self.d_type == 'socket':
-            return self.d_serial.send(bytearray.fromhex((data)))
+        try:
+            if self.d_type == 'serial':
+                return self.d_serial.write(bytearray.fromhex((data)))
+            elif self.d_type == 'socket':
+                return self.d_serial.send(bytearray.fromhex((data)))
+        except:
+            logging.info('[Serial Write] Connection Error')
 
     def connect_mqtt(self, server, name):
         mqtt_client = mqtt.Client()
@@ -377,7 +408,17 @@ class Kocom(rs485):
                 logger.info('[From HA]HomeAssistant Remove')
                 return
             elif _topic[3] == 'scan':
-                self.scan_serial(now=True)
+                for d_name in KOCOM_DEVICE.values():
+                    if d_name == DEVICE_ELEVATOR or d_name == DEVICE_GAS:
+                        self.wp_list[d_name][DEVICE_WALLPAD] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                    elif d_name == DEVICE_FAN:
+                        self.wp_list[d_name][DEVICE_WALLPAD] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                    elif d_name == DEVICE_THERMOSTAT:
+                        for r_name in KOCOM_ROOM_THERMOSTAT.values():
+                            self.wp_list[d_name][r_name] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
+                    elif d_name == DEVICE_LIGHT or d_name == DEVICE_PLUG:
+                        for r_name in KOCOM_ROOM.values():
+                            self.wp_list[d_name][r_name] = {'scan': {'tick': 0, 'count': 0, 'last': 0}}
                 logger.info('[From HA]HomeAssistant Scan')
                 return
             elif _topic[3] == 'packet':
@@ -391,7 +432,7 @@ class Kocom(rs485):
         logger.info("Message: {} = {}".format(msg.topic, _payload))
         
         if self.ha_registry != False and self.ha_registry == msg.topic and self.kocom_scan:
-            self.scan_serial(initial=True)
+            self.kocom_scan = False
 
     def parse_message(self, topic, payload):
         device = topic[1]
@@ -459,7 +500,7 @@ class Kocom(rs485):
                     self.wp_list[device][room]['speed']['set'] = payload
                     self.wp_list[device][room]['mode']['set'] = 'on'
                 elif command == 'mode':
-                    self.wp_list[device][room]['speed']['set'] = 'medium' if payload == 'on' else 'off'
+                    self.wp_list[device][room]['speed']['set'] = DEFAULT_SPEED if payload == 'on' else 'off'
                     self.wp_list[device][room]['mode']['set'] = payload
                 self.wp_list[device][room]['speed']['last'] = 'set'
                 self.wp_list[device][room]['mode']['last'] = 'set'
@@ -755,6 +796,9 @@ class Kocom(rs485):
                     self.packet_parsing(packet)
                 packet = ''
                 start_flag = False
+            if not self.connected:
+                logger.debug('[ERROR] 서버 연결이 끊어져 get_serial Thread를 종료합니다.')
+                break
 
     def check_sum(self, packet):
         sum_packet = sum(bytearray.fromhex(packet)[:17])
@@ -804,7 +848,7 @@ class Kocom(rs485):
             elif v['src_device'] == DEVICE_LIGHT or v['src_device'] == DEVICE_PLUG:
                 v['value'] = self.parse_switch(v['src_device'], v['src_room'], p['value'])
             elif v['src_device'] == DEVICE_THERMOSTAT:
-                v['value'] = self.parse_thermostat(p['value'])
+                v['value'] = self.parse_thermostat(p['value'], self.wp_list[v['src_device']][v['src_room']]['target_temp']['state'])
             elif v['src_device'] == DEVICE_WALLPAD and v['dst_device'] == DEVICE_ELEVATOR:
                 v['value'] = 'off'
             elif v['src_device'] == DEVICE_GAS:
@@ -841,6 +885,10 @@ class Kocom(rs485):
     def set_list(self, device, room, value, name='kocom'):
         try:
             logger.info('[From {}]{}/{}/state = {}'.format(name, device, room, value))
+            if 'scan' in self.wp_list[device][room] and type(self.wp_list[device][room]['scan']) == dict:
+                self.wp_list[device][room]['scan']['tick'] = time.time()
+                self.wp_list[device][room]['scan']['count'] = 0
+                self.wp_list[device][room]['scan']['last'] = 0
             if device == DEVICE_GAS or device == DEVICE_ELEVATOR:
                 self.wp_list[device][room][device]['state'] = value
                 self.wp_list[device][room][device]['last'] = 'state'
@@ -850,7 +898,7 @@ class Kocom(rs485):
                     try:
                         if sub == 'mode':
                             self.wp_list[device][room][sub]['state'] = v
-                            self.wp_list[device][room]['speed']['state'] = 'off' if v == 'off' else 'medium'
+                            self.wp_list[device][room]['speed']['state'] = 'off' if v == 'off' else DEFAULT_SPEED
                         else:
                             self.wp_list[device][room][sub]['state'] = v
                             self.wp_list[device][room]['mode']['state'] = 'off' if v == 'off' else 'on'
@@ -894,28 +942,46 @@ class Kocom(rs485):
                             if type(d_list) == dict and ((device == DEVICE_ELEVATOR and self.wp_elevator) or (device == DEVICE_FAN and self.wp_fan) or (device == DEVICE_GAS and self.wp_gas) or (device == DEVICE_LIGHT and self.wp_light) or (device == DEVICE_PLUG and self.wp_plug) or (device == DEVICE_THERMOSTAT and self.wp_thermostat)):
                                 for room, r_list in d_list.items():
                                     if type(r_list) == dict:
-                                        for sub_d, sub_v in r_list.items():
-                                            if sub_v['count'] > 4:
-                                                sub_v['count'] = 0
-                                                sub_v['last'] = 'state'
-                                            elif sub_v['last'] == 'set':
-                                                sub_v['last'] = now
-                                                if device == DEVICE_GAS:
-                                                    sub_v['last'] += 5
-                                                elif device == DEVICE_ELEVATOR:
-                                                    sub_v['last'] = 'state'
-                                                self.set_serial(device, room, sub_d, sub_v['set'])
-                                            elif type(sub_v['last']) == float and now - sub_v['last'] > 1:
-                                                sub_v['last'] = 'set' 
-                                                sub_v['count'] += 1
+                                        if 'scan' in r_list and type(r_list['scan']) == dict and now - r_list['scan']['tick'] > SCAN_INTERVAL and ((device == DEVICE_FAN and self.wp_fan) or (device == DEVICE_GAS and self.wp_gas) or (device == DEVICE_LIGHT and self.wp_light) or (device == DEVICE_PLUG and self.wp_plug) or (device == DEVICE_THERMOSTAT and self.wp_thermostat)):
+                                            if now - r_list['scan']['last'] > 2:
+                                                r_list['scan']['count'] += 1
+                                                r_list['scan']['last'] = now
+                                                self.set_serial(device, room, '', '', cmd='조회')
+                                                time.sleep(SCANNING_INTERVAL)
+                                            if r_list['scan']['count'] > 4:
+                                                r_list['scan']['tick'] = now
+                                                r_list['scan']['count'] = 0
+                                                r_list['scan']['last'] = 0
+                                        else:
+                                            for sub_d, sub_v in r_list.items():
+                                                if sub_d != 'scan':
+                                                    if sub_v['count'] > 4:
+                                                        sub_v['count'] = 0
+                                                        sub_v['last'] = 'state'
+                                                    elif sub_v['last'] == 'set':
+                                                        sub_v['last'] = now
+                                                        if device == DEVICE_GAS:
+                                                            sub_v['last'] += 5
+                                                        elif device == DEVICE_ELEVATOR:
+                                                            sub_v['last'] = 'state'
+                                                        self.set_serial(device, room, sub_d, sub_v['set'])
+                                                    elif type(sub_v['last']) == float and now - sub_v['last'] > 1:
+                                                        sub_v['last'] = 'set' 
+                                                        sub_v['count'] += 1
                     except:
                         logger.debug('[Scan]Error')
+            if not self.connected:
+                logger.debug('[ERROR] 서버 연결이 끊어져 scan_list Thread를 종료합니다.')
+                break
 
-    def set_serial(self, device, room, target, value):
+    def set_serial(self, device, room, target, value, cmd='상태'):
         if (time.time() - self.tick) < KOCOM_INTERVAL / 1000:
             return
-        logger.info('[To {}]{}/{}/{} -> {}'.format(self._name, device, room, target, value))
-        packet = self.make_packet(device, room, '상태', target, value)
+        if cmd == '상태':
+            logger.info('[To {}]{}/{}/{} -> {}'.format(self._name, device, room, target, value))
+        elif cmd == '조회':
+            logger.info('[To {}]{}/{} -> 조회'.format(self._name, device, room))
+        packet = self.make_packet(device, room, '상태', target, value) if cmd == '상태' else  self.make_packet(device, room, '조회', '', '')
         v = self.value_packet(self.parse_packet(packet))
 
         logger.debug('[To {}]{}'.format(self._name, packet))
@@ -958,7 +1024,7 @@ class Kocom(rs485):
                                 else:
                                     p_value += '00'
                             else:
-                                if sub_device in self.wp_list[device][room] and self.wp_list[device][room][sub_device]['set'] == 'on':
+                                if sub_device in self.wp_list[device][room] and self.wp_list[device][room][sub_device]['state'] == 'on':
                                     p_value += 'ff'
                                 else:
                                     p_value += '00'
@@ -973,7 +1039,8 @@ class Kocom(rs485):
                     if mode == 'heat':
                         p_value += '1100'
                     elif mode == 'off':
-                        p_value += '0001'
+                        # p_value += '0001'
+                        p_value += '0100'
                     else:
                         p_value += '1101'
                     p_value += '{0:02x}'.format(int(float(target_temp)))
@@ -999,51 +1066,6 @@ class Kocom(rs485):
             return packet
         return False
 
-    def scan_serial(self, now=False, initial=False):
-        packet_buf = []
-        is_packet = True
-        try:
-            logger.info('[KOCOM WALLPAD] MAKE SCAN PACKET')
-            if initial:
-                if self.wp_light:
-                    for room, r_value in self.wp_list[DEVICE_LIGHT].items():
-                        if type(r_value) == dict:
-                            logger.info('[SCAN]{}/{}'.format(DEVICE_LIGHT, room))
-                            packet_buf.append(self.make_packet(DEVICE_LIGHT, room, '조회', '', ''))
-                if self.wp_plug:
-                    for room, r_value in self.wp_list[DEVICE_PLUG].items():
-                        if type(r_value) == dict:
-                            logger.info('[SCAN]{}/{}'.format(DEVICE_PLUG, room))
-                            packet_buf.append(self.make_packet(DEVICE_PLUG, room, '조회', '', ''))
-                if self.wp_gas:
-                    logger.info('[SCAN]{}/{}'.format(DEVICE_GAS, DEVICE_WALLPAD))
-                    packet_buf.append(self.make_packet(DEVICE_GAS, DEVICE_WALLPAD, '조회', '', ''))
-                if self.wp_fan:
-                    logger.info('[SCAN]{}/{}'.format(DEVICE_FAN, DEVICE_WALLPAD))
-                    packet_buf.append(self.make_packet(DEVICE_FAN, DEVICE_WALLPAD, '조회', '', ''))
-            if self.wp_thermostat:
-                for room, r_value in self.wp_list[DEVICE_THERMOSTAT].items():
-                    if type(r_value) == dict:
-                        logger.info('[SCAN]{}/{}'.format(DEVICE_THERMOSTAT, room))
-                        packet_buf.append(self.make_packet(DEVICE_THERMOSTAT, room, '조회', '', ''))
-        except:
-            is_packet = False
-            logger.info('[KOCOM WALLPAD] MAKE SCAN PACKET FAIL')
-
-        self.kocom_scan = True
-        if is_packet:
-            logger.info('[KOCOM WALLPAD] Status Scanning START')
-            for packet in packet_buf:
-                time.sleep(SCANNING_INTERVAL)
-                self.packet_parsing(packet, from_to='To')
-                self.write(packet)
-            logger.info('[KOCOM WALLPAD] Status Scanning COMPLETE')
-        self.kocom_scan = False
-        self.ha_registry = False
-        if now is False:
-            scan = threading.Timer(SCAN_INTERVAL, self.scan_serial)
-            scan.start()
-
     def parse_fan(self, value='0000000000000000'):
         fan = {}
         fan['mode'] = 'on' if value[:2] == '11' else 'off'
@@ -1061,20 +1083,20 @@ class Kocom(rs485):
         switch[device + str('0')] = 'on' if on_count > 0 else 'off'
         return switch
 
-    def parse_thermostat(self, value='0000000000000000'):
+    def parse_thermostat(self, value='0000000000000000', init_temp=False):
         thermo = {}
         heat_mode = 'heat' if value[:2] == '11' else 'off'
         away_mode = 'on' if value[2:4] == '01' else 'off'
         thermo['current_temp'] = int(value[8:10], 16)
         if heat_mode == 'heat' and away_mode == 'on':
             thermo['mode'] = 'fan_only'
-            thermo['target_temp'] = INIT_TEMP
+            thermo['target_temp'] = INIT_TEMP if not init_temp else int(init_temp)
         elif heat_mode == 'heat' and away_mode == 'off':
             thermo['mode'] = 'heat'
             thermo['target_temp'] = int(value[4:6], 16)
         elif heat_mode == 'off':
             thermo['mode'] = 'off'
-            thermo['target_temp'] = INIT_TEMP
+            thermo['target_temp'] = INIT_TEMP if not init_temp else int(init_temp)
         return thermo
 
 class Grex:
@@ -1464,8 +1486,8 @@ if __name__ == '__main__':
     logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : Line %(lineno)s - %(message)s')
 
     # fileHandler, StreamHandler 생성
-    file_max_bytes = 10 * 1024 * 10 # 10 MB 사이즈
-    logFileHandler = logging.handlers.RotatingFileHandler(filename=CONF_LOGFILE, maxBytes=file_max_bytes, backupCount=10, encoding='utf-8')
+    file_max_bytes = 100 * 1024 * 10 # 1 MB 사이즈
+    logFileHandler = logging.handlers.RotatingFileHandler(filename=log_path, maxBytes=file_max_bytes, backupCount=10, encoding='utf-8')
     logStreamHandler = logging.StreamHandler()
 
     # handler 에 formatter 설정
@@ -1475,28 +1497,41 @@ if __name__ == '__main__':
 
     logger.addHandler(logFileHandler)
     #logger.addHandler(logStreamHandler)
-
+ 
     logging.info('{} 시작'.format(SW_VERSION))
     logger.info('{} 시작'.format(SW_VERSION))
 
-    r = rs485()
-    if r._type == 'serial':
-        for device in r._device:
-            if r._connect[device].isOpen():
-                _name = r._device[device]
-                try:
-                    logger.info('[CONFIG] {} 초기화'.format(_name))
-                    if _name == 'kocom':
-                        kocom = Kocom(r, _name, r._connect[device], 42)
-                    elif _name == 'grex_ventilator':
-                        _grex_ventilator = {'serial': r._connect[device], 'name': _name, 'length': 12}
-                    elif _name == 'grex_controller':
-                        _grex_controller = {'serial': r._connect[device], 'name': _name, 'length': 11}
-                except:
-                    logger.info('[CONFIG] {} 초기화 실패'.format(_name))
-    elif r._type == 'socket':
-        _name = r._device
-        if _name == 'kocom':
-            kocom = Kocom(r, _name, r._connect, 42)
-    if _grex_ventilator and _grex_controller:
-        _grex = Grex(r, _grex_controller, _grex_ventilator)
+    if DEFAULT_SPEED not in ['low', 'medium', 'high']:
+        logger.info('[Error] DEFAULT_SPEED 설정오류로 medium 으로 설정. {} -> medium'.format(DEFAULT_SPEED))
+        DEFAULT_SPEED = 'medium'
+
+    _grex_ventilator = False
+    _grex_controller = False
+    connection_flag = False
+    while not connection_flag:
+        r = rs485()
+        connection_flag = True
+        if r._type == 'serial':
+            for device in r._device:
+                if r._connect[device].isOpen():
+                    _name = r._device[device]
+                    try:
+                        logger.info('[CONFIG] {} 초기화'.format(_name))
+                        if _name == 'kocom':
+                            kocom = Kocom(r, _name, device, 42)
+                        elif _name == 'grex_ventilator':
+                            _grex_ventilator = {'serial': r._connect[device], 'name': _name, 'length': 12}
+                        elif _name == 'grex_controller':
+                            _grex_controller = {'serial': r._connect[device], 'name': _name, 'length': 11}
+                    except:
+                        logger.info('[CONFIG] {} 초기화 실패'.format(_name))
+        elif r._type == 'socket':
+            _name = r._device
+            if _name == 'kocom':
+                kocom = Kocom(r, _name, _name, 42)
+                if not kocom.connection_lost():
+                    logger.info('[ERROR] 서버 연결이 끊어져 1분 후 재접속을 시도합니다.')
+                    time.sleep(60)
+                    connection_flag = False
+        if _grex_ventilator is not False and _grex_controller is not False:
+            _grex = Grex(r, _grex_controller, _grex_ventilator)
