@@ -5,7 +5,7 @@
 ## About
 랜이님이 만든 코콤 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 0.7
+## Version : 0.7.1
 
 ## Installation
 
