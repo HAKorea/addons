@@ -12,7 +12,7 @@
 
  ### Commax Wallpad Controller with RS485 (commaxRS485)
 
- 그레고리하우스님이 만든 코콤 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
+ 그레고리하우스님이 만든 코맥스 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
 
   ### Webcam Video Capture with Motion Server (motion4hassio)
 
