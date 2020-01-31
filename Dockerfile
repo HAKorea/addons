@@ -14,7 +14,7 @@ RUN apk add --no-cache python3 && \
 	python -m pip install pyserial && \
 	python -m pip install paho-mqtt
 
-WORKDIR /data
+WORKDIR /share
 
 RUN chmod a+x /makeconf.sh
 RUN chmod a+x /run.sh
