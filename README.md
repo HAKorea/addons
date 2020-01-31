@@ -14,7 +14,7 @@
 
  그레고리하우스님이 만든 코콤 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
 
-  ### Webcam Video Capture with Motion Server (motion4hassio ver. 1.0)
+  ### Webcam Video Capture with Motion Server (motion4hassio)
 
  웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
  
