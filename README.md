@@ -10,13 +10,13 @@
 
  랜이님이 만든 코콤 월패드 파이썬 프로그램을 애드온으로 포팅한 것입니다.
 
- ### Webcam Video Capture with Motion Server (motion4hassio)
-
- 웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
-
  ### Commax Wallpad Controller with RS485 (wallpadRS485)
 
  그레고리하우스님이 만든 코콤 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
+
+  ### Webcam Video Capture with Motion Server (motion4hassio ver. 1.0)
+
+ 웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
  
 ### 문의
 네이버카페 : https://cafe.naver.com/koreassistant
