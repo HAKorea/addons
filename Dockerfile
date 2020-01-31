@@ -8,9 +8,12 @@ ENV LANG C.UTF-8
 COPY run.sh commax_homegateway.js /
 
 # Install requirements for add-on
-RUN apk add --no-cache jq npm
+RUN apk add --no-cache jq npm make gcc g++ python linux-headers udev && \
+    npm init -f && \
+    npm install mqtt && \
+    npm install serialport --build-from-source=serialport 
 
-WORKDIR /data
+WORKDIR /share
 
 RUN chmod a+x /run.sh
 
