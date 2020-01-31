@@ -6,11 +6,11 @@
  
  Owntracks Recorder를 애드온으로 만든 것입니다. ingress를 사용하여 사이드 패널에 추가할 수 있습니다. 
 
- ### Kocom Wallpad Controller with RS485 (wallpadRS485)
+ ### Kocom Wallpad Controller with RS485 (kocomRS485)
 
  랜이님이 만든 코콤 월패드 파이썬 프로그램을 애드온으로 포팅한 것입니다.
 
- ### Commax Wallpad Controller with RS485 (wallpadRS485)
+ ### Commax Wallpad Controller with RS485 (commaxRS485)
 
  그레고리하우스님이 만든 코콤 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
 
