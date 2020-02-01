@@ -1,8 +1,8 @@
 {
-  "name": "Wallpad Controller with RS485",
-  "version": "0.2",
+  "name": "Universal Wallpad Controller with RS485",
+  "version": "0.3",
   "slug": "wallpad",
-  "description": "Wallpad Controller for Hassio",
+  "description": "코콤 월패드를 기준으로 커스터마이징이 가능한 nodejs 서버 애드온입니다.",
   "arch": [
     "armhf",
     "armv7",
