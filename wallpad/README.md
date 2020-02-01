@@ -40,18 +40,19 @@ Add-on configuration:
       "username": "id",
       "password": "pw",
       "receivedelay": 10000
-    }
+    },
+    "customfile": "mygateway.js"
 }
 ```
 
-### Option: `serial` (required)
+### Option: `serial` (필수)
 
 * "port": "/dev/ttyUSB0" 	// 시리얼포트명
 * "baudrate": 9600 		// 시리얼 통신 속도
 * "parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
 * "senddelay": 150		// 전송 딜레이 1/1000초 단위
 
-### Option `MQTT` (required)
+### Option `MQTT` (필수)
 
 * "server": "192.168.x.xx"	// MQTT 서버
 * "username": "id"			// MQTT ID
@@ -59,24 +60,12 @@ Add-on configuration:
 * "receivedelay": 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
 
 
-### Option: `customefile` (optional)
+### Option: `customefile` (옵션)
 
 "customfile": "mygateway.js" 와 같이 설정하고
 share/mygateway.js 파일을 넣어두면 모든 설정을 무시하고 해당 파일로 nodejs를 실행함
 로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
-```json
-{ 
-	//- 중략 -
 
-	"mqtt": {
-		
-	//- 중략 -
-
-      "receivedelay": 10000
-    },
-    "customfile": "mygateway.js"
-}
-```
 ### JS 파일의 수정
 본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 그대로 쓰셔도 됩니다. 다만 customfile 옵션에 파일명을 작성하지 않으면 기본 파일은 share/wallpad.js 입니다. 
 
