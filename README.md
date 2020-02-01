@@ -61,9 +61,9 @@ Add-on configuration:
 
 ### Option: `customefile` (optional)
 
-"customfile": "myhomegateway.js" 와 같이 설정하고
-share/myhomegateway.js 파일을 넣어두면 모든 설정을 무시하고 해당 파일로 nodejs를 실행함
-로그창에 Initializing $customfile 이름이 표시됨
+"customfile": "mygateway.js" 와 같이 설정하고
+share/mygateway.js 파일을 넣어두면 모든 설정을 무시하고 해당 파일로 nodejs를 실행함
+로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
 ```json
 { 
 	//------------ 중략 ------------
@@ -76,7 +76,7 @@ share/myhomegateway.js 파일을 넣어두면 모든 설정을 무시하고 해�
 }
 ```
 ### JS 파일의 수정
-본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 그대로 쓰셔도 됩니다. 다만 customfile 옵션에 파일명을 작성하지 않으면 기본 파일명은 wallpad.js 입니다. 
+본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 그대로 쓰셔도 됩니다. 다만 customfile 옵션에 파일명을 작성하지 않으면 기본 파일은 share/wallpad.js 입니다. 
 
 애드온의 옵션을 월패드 js에서 사용하려면 다음과 같습니다.
 ```js
