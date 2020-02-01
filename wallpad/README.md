@@ -66,13 +66,15 @@ share/mygateway.js 파일을 넣어두면 모든 설정을 무시하고 해당 �
 로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
 ```json
 { 
-	//------------ 중략 ------------
+	//- 중략 -
+
 	"mqtt": {
 		
-	//------------ 중략 ------------
+	//- 중략 -
+
       "receivedelay": 10000
     },
-    "customfile": "myhomegateway.js"
+    "customfile": "mygateway.js"
 }
 ```
 ### JS 파일의 수정
