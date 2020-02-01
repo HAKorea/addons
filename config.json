@@ -1,0 +1,49 @@
+{
+  "name": "Wallpad Controller with RS485",
+  "version": "0.2",
+  "slug": "wallpad",
+  "description": "Wallpad Controller for Hassio",
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
+  "map": [
+    "share:rw"
+  ],
+  "url": "https://github.com/HAKorea/addons",
+  "startup": "application",
+  "boot": "auto",
+  "auto_uart": true,
+  "options": {
+    "serial":{
+      "port": "/dev/ttyUSB0",
+      "baudrate": 9600,
+      "parity" : "none",
+      "senddelay": 150
+    },
+    "mqtt": {
+      "server": "192.168.x.x",
+      "username": "id",
+      "password": "pw",
+      "receivedelay": 10000
+    }
+  },
+  "schema": {
+    "serial":{
+      "port": "str",
+      "baudrate": "int",
+      "parity" : "list(none|even|odd)",
+      "senddelay": "int"
+    },
+    "mqtt": {
+      "server": "str",
+      "username": "str",
+      "password": "str",
+      "receivedelay": "int"
+    },
+    "customfile": "str?"
+  }
+}
