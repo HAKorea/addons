@@ -12,7 +12,7 @@
  그레고리하우스님이 만든 코맥스 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
  기본적으로 코맥스로 동작하며 커스터마이징이 가능한 애드온으로 다른 아파트 nodejs 파일을 사용할 수 있습니다. 
 
-### Webcam Video Capture with Motion Server (motion4hassio)
+### USB Video Connector Addon with Motion Server (motion4hassio)
 
  웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
 
