@@ -46,17 +46,17 @@ Add-on configuration:
 
 ### Option: `serial` (required)
 
-"port": "/dev/ttyUSB0" 	// 시리얼포트명
-"baudrate": 9600 		// 시리얼 통신 속도
-"parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
-"senddelay": 150		// 전송 딜레이 1/1000초 단위
+* "port": "/dev/ttyUSB0" 	// 시리얼포트명
+* "baudrate": 9600 		// 시리얼 통신 속도
+* "parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
+* "senddelay": 150		// 전송 딜레이 1/1000초 단위
 
 ### Option `MQTT` (required)
 
-"server": "192.168.x.xx"	// MQTT 서버
-"username": "id"			// MQTT ID
-"password": "pw"			// MQTT PW
-"receivedelay": 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
+* "server": "192.168.x.xx"	// MQTT 서버
+* "username": "id"			// MQTT ID
+* "password": "pw"			// MQTT PW
+* "receivedelay": 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
 
 
 ### Option: `customefile` (optional)
