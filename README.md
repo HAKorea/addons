@@ -57,3 +57,15 @@ camera:
 ```
 http://your.ip.add.ress:8080/ 으로 브라우저에서 접속하면 Motion 웹관리 화면으로 접근 가능합니다.
 ```
+
+## 문제해결
+
+연결된 USB 비디오 장치가 없으면 실행할 수 없습니다.
+문제가 생기면 
+```sh
+$ docker logs hassio_supervisor
+```
+명령을 실행하면 서버 에러 로그를 볼 수 있습니다. 
+```log
+20-02-01 14:30:47 ERROR (SyncWorker_9) [hassio.docker] Can't start addon_25b6f150_motion: 500 Server Error: Internal Server Error ("error gathering device information while adding custom device "/dev/video0": no such file or directory")
+```
