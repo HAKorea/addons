@@ -4,7 +4,7 @@
   "slug": "owntracks",
   "description": "Owntracks Recorder for Hassio",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
-  "url": "https://github.com/zooil/lab404",
+  "url": "https://github.com/HAKorea/addons",
   "startup": "application",
   "boot": "auto",
   "ingress": true,
