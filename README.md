@@ -6,17 +6,7 @@ USB 웹캠 또는 Easycap 을 사용하여 Composite 비디오를 사용하게 �
 Motion : https://motion-project.github.io/
 
 ## Configuration
-애드온을 설치한 후 영상을 저장할 디렉토리(target_dir)를 생성해야 합니다. 
-
-도커로 설치한 경우 
-
-homeassistant/www/video
-
-애드온으로 접근한 경우(configurator 애드온을 사용하는 경우) 
-
-/config/www/video
-
-디렉토리를 생성하세요.  
+애드온을 설치한 후 영상/이미지를 저장할 디렉토리(target_dir)를 지정 해야 합니다. 
 
 기본 설정은 Motion 과 동일하지만 일부 설정을 애드온에서 변경 가능하도록 제작했습니다.
 https://motion-project.github.io/motion_config.html

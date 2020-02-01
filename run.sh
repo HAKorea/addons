@@ -72,8 +72,11 @@ else
 	echo "[Info] homeassistant/script/motion directory exists. skip copying scripts"
 fi
 
+if [ ! -d $TARGETDIR ]; then
+	mkdir -p $TARGETDIR
+fi
 # start server
 echo "[Info] Doorbell Video Capture stand by..."
 motion -c $MOTION_CONF
 
-#while true; do echo "still live"; sleep 1800; done
+while true; do echo "still live"; sleep 1800; done
