@@ -38,8 +38,10 @@ https://motion-project.github.io/motion_config.html
 on_event_start, on_event_end, on_movie_end 는 삭제 가능합니다. 
 설치를 바로하면 /config/scripts/motion/안에 start.sh, movie.sh, end.sh 3가지 쉘스크립트 파일이 들어있습니다. 이것은 이벤트가 발생하면 애드온 로그에 아래와 같이 나타납니다. 
 ``` log
-[1:Unknown] [NTC] [EVT] event_newfile: File of type 8 saved to: /config/www/video/0-01-20200112233458.mp4
-[1:Unknown] [NTC] [ALL] motion_detected: Motion detected - starting event 1
+[1:Unknown] [NTC] [EVT] event_newfile: File of type 8 saved 
+  to: /config/www/video/0-01-20200112233458.mp4
+[1:Unknown] [NTC] [ALL] motion_detected: Motion detected 
+  - starting event 1
 [Info] Motion Start  ### start.sh 실행
 [1:Unknown] [NTC] [ALL] mlp_actions: End of event 1
 [Info] Movie End     ### movie.sh 실행
@@ -67,5 +69,8 @@ $ docker logs hassio_supervisor
 ```
 명령을 실행하면 서버 에러 로그를 볼 수 있습니다. 
 ```log
-20-02-01 14:30:47 ERROR (SyncWorker_9) [hassio.docker] Can't start addon_25b6f150_motion: 500 Server Error: Internal Server Error ("error gathering device information while adding custom device "/dev/video0": no such file or directory")
+20-02-01 14:30:47 ERROR (SyncWorker_9) [hassio.docker] Can't start 
+addon_25b6f150_motion: 500 Server Error: Internal Server Error 
+("error gathering device information while adding custom device 
+"/dev/video0": no such file or directory")
 ```
