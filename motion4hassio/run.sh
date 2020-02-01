@@ -73,7 +73,10 @@ else
 fi
 
 if [ ! -d $TARGETDIR ]; then
+	echo "[Info] making TARGET DIRECTORY..."
 	mkdir -p $TARGETDIR
+else
+	echo "[Info] TARGET DIRECTORY already exists"
 fi
 # start server
 echo "[Info] Doorbell Video Capture stand by..."
