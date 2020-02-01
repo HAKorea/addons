@@ -3,9 +3,9 @@
 ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield]
 
 ## About
-2/10일에 삭제 예정입니다. Wallpad Controller with RS485 애드온으로 설치하세요.  
+2/10일에 삭제 예정입니다. Universal Wallpad Controller with RS485 애드온으로 설치하세요.  
 
-관리를 위해 업데이트 된 내용을 범용 컨트롤러로 만든 것이 Wallpad Controller with RS485입니다.  
+관리를 위해 업데이트 된 내용을 범용 컨트롤러로 만든 것이 Universal Wallpad Controller with RS485입니다.  
 
 
 
