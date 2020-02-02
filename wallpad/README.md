@@ -4,9 +4,10 @@
 
 ## About
 그레고리 하우스님이 만든 nodejs 월패드 프로그램을 애드온으로 만든 것입니다.
-기본은 코콤으로 동작합니다만 커스텀으로 js 파일을 변경하시면 삼성, 대림 등 다른 아파트 월패드를 동작시킬 수 있는 nodejs 서버입니다. 
+코맥스, 삼성, 대림 아파트 월패드를 동작시킬 수 있는 nodejs 서버입니다. 
+커스텀파일 설정이 가능해서 본인이 사용하는 nodejs 파일이 있다면 교체해서 쓰시면 됩니다.
 
-## Version : 0.7
+## Version : 0.8
 
 ## Installation
 
@@ -19,7 +20,7 @@
 7. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
 8. "START" 버튼으로 애드온을 실행합니다.
 
-애드온을 최초 실행하면 share/wallpad.js 파일이 생성됩니다. 만일 wallpad.js 파일은 본인의 월패드에 맞게 수정하셔도 됩니다. 수정한 후 애드온을 재실행하면 수정한 js 파일로 실행됩니다. 
+애드온을 최초 실행하면 share/모델명_wallpad.js 파일이 생성됩니다. 모델명_wallpad.js 파일은 본인의 월패드에 맞게 수정하셔도 됩니다. 수정한 후 애드온을 재실행하면 수정한 js 파일로 실행됩니다. 
 
 
 
@@ -73,7 +74,7 @@ share/mygateway.js 파일을 넣어두면 애드온의 모든 설정을 무시�
 
 ### JS 파일의 수정
 본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 customfile 옵션으로 사용하세요. 
-월패드에서 일부 기능을 수정하려면 share/모델명.js 파일을 수정하시면됩니다. 
+월패드에서 일부 기능을 수정하려면 share/모델명_wallpad.js 파일을 수정하시면됩니다. 
 
 애드온의 옵션을 월패드 js에서 사용하려면 다음과 같습니다.
 ```js
@@ -117,7 +118,7 @@ const CONST = {
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/HAKorea/addons
-[issue]: https://github.com/zooil/commaxRS485/issues
+[issue]: https://github.com/zooil/wallpad/issues
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
