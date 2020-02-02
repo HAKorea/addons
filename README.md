@@ -26,8 +26,3 @@ Owntracks Recorder를 애드온으로 만든 것입니다. ingress를 사용하�
 네이버카페 : https://cafe.naver.com/koreassistant
 
 
-***
-## 삭제 예정 애드온
-
-### Commax Wallpad Controller with RS485 (commaxRS485)
-Universal Wallpad Controller with RS485를 설치해주세요. 기본적으로 코멕스로 동작하며 커스터마이징이 가능한 애드온으로 업데이트 했습니다. 
