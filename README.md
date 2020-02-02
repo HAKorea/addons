@@ -6,7 +6,7 @@
 그레고리 하우스님이 만든 nodejs 월패드 프로그램을 애드온으로 만든 것입니다.
 기본은 코콤으로 동작합니다만 커스텀으로 js 파일을 변경하시면 삼성, 대림 등 다른 아파트 월패드를 동작시킬 수 있는 nodejs 서버입니다. 
 
-## Version : 0.3
+## Version : 0.7
 
 ## Installation
 
@@ -29,6 +29,7 @@ Add-on configuration:
 
 ```json
 {
+    "model": "commax",
     "serial":{
       "port": "/dev/ttyUSB0",
       "baudrate": 9600,
@@ -44,6 +45,10 @@ Add-on configuration:
     "customfile": "mygateway.js"
 }
 ```
+
+### Option: `model` (필수)
+월패드 모델명을 입력합니다. 가능한 모델명은 commax , samsung , daelim 입니다.
+다른 월패드의 nodejs 파일을 갖고 계신분은 [이곳 이슈][issue]로 올려주시면 반영하겠습니다.
 
 ### Option: `serial` (필수)
 
@@ -63,15 +68,17 @@ Add-on configuration:
 ### Option: `customefile` (옵션)
 
 "customfile": "mygateway.js" 와 같이 설정하고
-share/mygateway.js 파일을 넣어두면 모든 설정을 무시하고 해당 파일로 nodejs를 실행함
+share/mygateway.js 파일을 넣어두면 애드온의 모든 설정을 무시하고 해당 파일로 nodejs를 실행합니다.
 로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
 
 ### JS 파일의 수정
-본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 그대로 쓰셔도 됩니다. 다만 customfile 옵션에 파일명을 작성하지 않으면 기본 파일은 share/wallpad.js 입니다. 
+본인이 사용중인 월패드용 js 파일이 있다면 해당 파일을 customfile 옵션으로 사용하세요. 
+월패드에서 일부 기능을 수정하려면 share/모델명.js 파일을 수정하시면됩니다. 
 
 애드온의 옵션을 월패드 js에서 사용하려면 다음과 같습니다.
 ```js
-const CONFIG = require('/data/options.json');  //**** 애드온의 옵션을 불러옵니다. 옵션 파일의 위치는 변경 불가합니다. 
+const CONFIG = require('/data/options.json');  
+//**** 애드온의 옵션을 불러옵니다. 옵션 파일의 위치는 변경 불가합니다. 
 // 이후 CONFIG.mqtt.username 과 같이 사용가능합니다. 
 // 사용가능한 옵션
 CONFIG.serial.port
@@ -98,11 +105,11 @@ const CONST = {
 
 ## Support
 
-Got questions?
+궁금한 점이 있으신가요??
 
-You have several options to get them answered:
+아래에 문의 하시면 답변을 구하실 수 있습니다.:
 
-- The [Korean Community Addons Github][github].
+- The [Home Assistant Korean Community][github].
 - The [Home Assistant 네이버카페][forum].
 
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
