@@ -198,13 +198,11 @@ client.on('connect', () => {
     client.subscribe(CONST.DEVICE_TOPIC, (err) => {if (err) log('MQTT Subscribe fail! -', CONST.DEVICE_TOPIC) });
 });
 
-log('Initializing: ', CONFIG.type);
-
 // Socket
 if(CONFIG.type == 'socket'){
 	// EW11 연결 (수정필요)        
 	const sock = new net.Socket();                             
-	                                                             
+	log('Initializing: SOCKET');                               
 	sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
 	      log('[Socket] Success connect server');                     
 	}); 
@@ -213,6 +211,7 @@ if(CONFIG.type == 'socket'){
 else{
 	//-----------------------------------------------------------
 	// SerialPort 모듈 초기화
+	log('Initializing: SERIAL');    
 	const port = new SerialPort(CONST.portName, {
 	    baudRate: CONFIG.serial.baudrate,
 	    dataBits: 8,
