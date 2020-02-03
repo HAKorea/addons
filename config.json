@@ -1,6 +1,6 @@
 {
   "name": "Wallpad Controller with RS485",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "slug": "wallpad",
   "description": "코맥스/삼성/대림 월패드가 가능한 nodejs 서버 애드온입니다.",
   "arch": [
@@ -54,7 +54,7 @@
       "server": "str",
       "username": "str",
       "password": "str",
-      "receivedelay": "int"
+      "receiveDelay": "int"
     },
     "customfile": "str?"
   }

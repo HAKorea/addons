@@ -6,7 +6,7 @@
 그레고리 하우스님이 만든 nodejs 월패드 프로그램을 애드온으로 만든 것입니다.
 코맥스, 삼성, 대림 아파트 월패드를 동작시킬 수 있는 nodejs 서버입니다. 
 커스텀파일 설정이 가능해서 본인이 사용하는 nodejs 파일이 있다면 교체해서 쓰시면 됩니다.
-[네이버 Homeassistant 카페][https://cafe.naver.com/koreassistant]
+[네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant)
 
 ## Version : 0.8.1
 
@@ -68,11 +68,17 @@ Add-on configuration:
 * "parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
 * "senddelay": 150		// 전송 딜레이 1/1000초 단위
 
-### Option: `socket` (옵션)
+// "type": "socket" 인 경우 내부 값을 모두 삭제 가능
+"serial": {}
+
+### Option: `socket` (옵션) - 아직 samsung 만 지원합니다. 테스트가 더 필요합니다. 
 "type": "socket" 로 설정한 경우 아래 옵션 사용
 
 * "deviceIP": "192.0.x.x"  // elfin과 같은 wifi to RS485 기기의 ip 주소
 * "port": 8899    // elfin과 같은 wifi to RS485 기기의 port 주소
+
+// "type": "serial" 인 경우 내부 값을 모두 삭제 가능 
+"socket": {}
 
 ### Option `MQTT` (필수)
 
