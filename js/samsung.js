@@ -7,6 +7,7 @@
  
 const util = require('util');
 const SerialPort = require('serialport');
+const net = require('net');		// Socket
 const mqtt = require('mqtt');
 
 const CONFIG = require('/data/options.json');  //**** 애드온의 옵션을 불러옵니다. 이후 CONFIG.mqtt.username 과 같이 사용가능합니다. 
@@ -17,13 +18,13 @@ util.inherits(CustomParser, Transform);
 
 const CONST = {
     // 포트이름 설정/dev/ttyUSB0
-    portName: process.platform.startsWith('win') ? "COM6" : CONFIG.serial.port,
+    portName: process.platform.startsWith('win') ? "COM6" : CONFIG.serial.port,	
     // SerialPort 전송 Delay(ms)
-    sendDelay: CONFIG.serial.senddelay,
+    sendDelay: CONFIG.sendDelay,
     // MQTT 브로커
     mqttBroker: 'mqtt://'+CONFIG.mqtt.server, // *************** 환경에 맞게 수정하세요! **************
     // MQTT 수신 Delay(ms)
-    mqttDelay: CONFIG.mqtt.receivedelay,
+    mqttDelay: CONFIG.mqtt.receiveDelay,
 
     mqttUser: CONFIG.mqtt.username,  // *************** 환경에 맞게 수정하세요! **************
     mqttPass: CONFIG.mqtt.password, // *************** 환경에 맞게 수정하세요! **************
@@ -196,24 +197,39 @@ const client  = mqtt.connect(CONST.mqttBroker, {clientId: CONST.clientID,
 client.on('connect', () => {
     client.subscribe(CONST.DEVICE_TOPIC, (err) => {if (err) log('MQTT Subscribe fail! -', CONST.DEVICE_TOPIC) });
 });
-// SerialPort 모듈 초기화
-const port = new SerialPort(CONST.portName, {
-    baudRate: CONFIG.serial.baudrate,
-    dataBits: 8,
-    parity: CONFIG.serial.parity,
-	stopBits: 1,
-	autoOpen: false,
-	encoding: 'hex'
-});
-const parser = port.pipe(new CustomParser());
 
-port.on('open', () => log('Success open port:', CONST.portName));
-port.open((err) => {
-	if (err) {
-		return log('Error opening port:', err.message)
-	}
-})
+log('Initializing: ', CONFIG.type);
 
+// Socket
+if(CONFIG.type == 'socket'){
+	// EW11 연결 (수정필요)        
+	const sock = new net.Socket();                             
+	                                                             
+	sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
+	      log('[Socket] Success connect server');                     
+	}); 
+	const parser = sock.pipe(new CustomParser());   
+}
+else{
+	//-----------------------------------------------------------
+	// SerialPort 모듈 초기화
+	const port = new SerialPort(CONST.portName, {
+	    baudRate: CONFIG.serial.baudrate,
+	    dataBits: 8,
+	    parity: CONFIG.serial.parity,
+		stopBits: 1,
+		autoOpen: false,
+		encoding: 'hex'
+	});
+	const parser = port.pipe(new CustomParser());
+
+	port.on('open', () => log('[Serial] Success open port:', CONST.portName));
+	port.open((err) => {
+		if (err) {
+			return log('Error opening port:', err.message)
+		}
+	})
+}
 //////////////////////////////////////////////////////////////////////////////////////
 // 홈넷에서 SerialPort로 상태 정보 수신
 parser.on('data', function (data) {
@@ -352,10 +368,15 @@ const commandProc = () => {
 
 	// 큐에서 제어 메시지 가져오기
 	var obj = queue.shift();
-	port.write(obj.commandHex, (err) => {if(err)  return log('[Serial] Send Error: ', err.message); });
+	if(CONFIG.type == 'socket'){
+		sock.write(obj.commandHex, (err) => {if(err)  return log('[Socket] Send Error: ', err.message); });  // Socket
+	}
+	else{
+		port.write(obj.commandHex, (err) => {if(err)  return log('[Serial] Send Error: ', err.message); });
+	}
 	lastReceive = new Date().getTime();
 	obj.sentTime = lastReceive;	// 명령 전송시간 sentTime으로 저장
-	log('[Serial] Send to Device:', obj.deviceId, obj.subId, '->', obj.state, '('+delay+'ms) ', obj.commandHex.toString('hex'));
+	log('Send to Device:', obj.deviceId, obj.subId, '->', obj.state, '('+delay+'ms) ', obj.commandHex.toString('hex'));
 	
 	// 다시 큐에 저장하여 Ack 메시지 받을때까지 반복 실행  // 일괄소등(Light) 아니면 // 일괄소등이면 조명1상태 읽기
 	if((obj.deviceId == 'Light') && (obj.subId == '')){
