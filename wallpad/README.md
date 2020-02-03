@@ -6,8 +6,9 @@
 그레고리 하우스님이 만든 nodejs 월패드 프로그램을 애드온으로 만든 것입니다.
 코맥스, 삼성, 대림 아파트 월패드를 동작시킬 수 있는 nodejs 서버입니다. 
 커스텀파일 설정이 가능해서 본인이 사용하는 nodejs 파일이 있다면 교체해서 쓰시면 됩니다.
+[네이버 Homeassistant 카페][https://cafe.naver.com/koreassistant]
 
-## Version : 0.8
+## Version : 0.8.1
 
 ## Installation
 
@@ -30,18 +31,23 @@ Add-on configuration:
 
 ```json
 {
-    "model": "commax",
+    "model":"commax",
+    "type": "serial",
+    "sendDelay": 150,
     "serial":{
       "port": "/dev/ttyUSB0",
       "baudrate": 9600,
-      "parity" : "none",
-      "senddelay": 150
+      "parity" : "none"
+    },
+    "socket" : {
+      "deviceIP": "192.0.0.1",
+      "port": 8899
     },
     "mqtt": {
       "server": "192.168.x.x",
       "username": "id",
       "password": "pw",
-      "receivedelay": 10000
+      "receiveDelay": 10000
     },
     "customfile": "mygateway.js"
 }
@@ -51,12 +57,22 @@ Add-on configuration:
 월패드 모델명을 입력합니다. 가능한 모델명은 commax , samsung , daelim 입니다.
 다른 월패드의 nodejs 파일을 갖고 계신분은 [이곳 이슈][issue]로 올려주시면 반영하겠습니다.
 
-### Option: `serial` (필수)
+### Option: `type` (필수)
+통신 방법: serial 또는 socket
+
+### Option: `serial` (옵션)
+"type": "serial" 로 설정한 경우 아래 옵션 사용
 
 * "port": "/dev/ttyUSB0" 	// 시리얼포트명
 * "baudrate": 9600 		// 시리얼 통신 속도
 * "parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
 * "senddelay": 150		// 전송 딜레이 1/1000초 단위
+
+### Option: `socket` (옵션)
+"type": "socket" 로 설정한 경우 아래 옵션 사용
+
+* "deviceIP": "192.0.x.x"  // elfin과 같은 wifi to RS485 기기의 ip 주소
+* "port": 8899    // elfin과 같은 wifi to RS485 기기의 port 주소
 
 ### Option `MQTT` (필수)
 
@@ -82,14 +98,17 @@ const CONFIG = require('/data/options.json');
 //**** 애드온의 옵션을 불러옵니다. 옵션 파일의 위치는 변경 불가합니다. 
 // 이후 CONFIG.mqtt.username 과 같이 사용가능합니다. 
 // 사용가능한 옵션
+CONFIG.type
+CONFIG.sendDelay
+
 CONFIG.serial.port
 CONFIG.serial.baudrate
 CONFIG.serial.parity
-CONFIG.serial.senddelay
+
 CONFIG.mqtt.server
 CONFIG.mqtt.username
 CONFIG.mqtt.password
-CONFIG.mqtt.receivedelay
+CONFIG.mqtt.receiveDelay
 
 //------------ 적용 예시 ------------
 const CONST = {
@@ -114,6 +133,11 @@ const CONST = {
 - The [Home Assistant 네이버카페][forum].
 
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
+
+## RELEASE NOTES
+
+0.8.1 삼성 월패드 소켓 연결 추가 
+0.8 코맥스 월패드 테스트 완료
 
 
 [forum]: https://cafe.naver.com/koreassistant

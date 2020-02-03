@@ -17,11 +17,11 @@ const CONST = {
     // 포트이름 설정/dev/ttyUSB0
     portName: process.platform.startsWith('win') ? "COM6" : CONFIG.serial.port,
     // SerialPort 전송 Delay(ms)
-    sendDelay: CONFIG.serial.senddelay,
+    sendDelay: CONFIG.sendDelay,
     // MQTT 브로커
     mqttBroker: 'mqtt://'+CONFIG.mqtt.server, // *************** 환경에 맞게 수정하세요! **************
     // MQTT 수신 Delay(ms)
-    mqttDelay: CONFIG.mqtt.receivedelay,
+    mqttDelay: CONFIG.mqtt.receiveDelay,
 
     mqttUser: CONFIG.mqtt.username,  // *************** 환경에 맞게 수정하세요! **************
     mqttPass: CONFIG.mqtt.password, // *************** 환경에 맞게 수정하세요! **************
