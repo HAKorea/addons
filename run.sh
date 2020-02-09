@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -e
+set -e
 
 CONFIG_PATH=/data/options.json
 
@@ -25,8 +25,6 @@ else
 	ln -s /share/gawebserver/assistant /root/.config/google-assistant-library/assistant
 fi
 
-/root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
-
 ACCESS_TOKEN=/share/gawebserver/access_token.json
 CLIENT_SECRET=/share/gawebserver/client_secret.json
 
@@ -37,6 +35,7 @@ elif [ ! -f "$ACCESS_TOKEN" ]; then
     echo "[Error] You need initialize GoogleAssistant with a client secret json!"
     exit 1
 fi
+#    /root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
 
 exec python3 /gawebserver.py --credentials "$ACCESS_TOKEN" --project-id "$PROJECT_ID" --device-model-id "$DEVICE_MODEL_ID" < /dev/null
 
