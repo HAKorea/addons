@@ -28,6 +28,8 @@ fi
 ACCESS_TOKEN=/share/gawebserver/access_token.json
 CLIENT_SECRET=/share/gawebserver/client_secret.json
 
+/root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
+
 if [ ! -f "$ACCESS_TOKEN" ] && [ -f "$CLIENT_SECRET" ]; then
     echo "[Info] Start WebUI for handling oauth2"
     python3 /oauth.py "$CLIENT_SECRET" "$ACCESS_TOKEN"
@@ -35,7 +37,6 @@ elif [ ! -f "$ACCESS_TOKEN" ]; then
     echo "[Error] You need initialize GoogleAssistant with a client secret json!"
     exit 1
 fi
-#    /root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
 
 exec python3 /gawebserver.py --credentials "$ACCESS_TOKEN" --project-id "$PROJECT_ID" --device-model-id "$DEVICE_MODEL_ID" < /dev/null
 
