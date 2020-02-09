@@ -1,0 +1,33 @@
+{
+  "name": "Google Assistant Web Server for hassio",
+  "version": "0.4.1",
+  "slug": "gawebserver",
+  "description": "Addon version of robwolff3 GA Webserver",
+  "arch": [
+    "armhf",
+    "amd64"
+  ],
+  "map": [
+    "share:rw"
+  ],
+  "devices": ["/dev/snd:/dev/snd:rwm"],
+  "ports": {
+    "9324/tcp": 9324,
+    "5000/tcp": 5000
+  },
+  "webui": "http://[HOST]:[PORT:9324]",
+  "url": "https://github.com/HAKorea/addons",
+  "startup": "application",
+  "boot": "auto",
+  "audio": true,
+  "options": {
+    "client_secrets": "client_secret.json",
+    "project_id": null,
+    "model_id": null
+  },
+  "schema": {
+    "client_secrets": "str",
+    "project_id": "str",
+    "model_id": "str"
+  }
+}
