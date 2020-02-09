@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -e
+set -e
 
 CONFIG_PATH=/data/options.json
 
@@ -25,10 +25,10 @@ else
 	ln -s /share/gawebserver/assistant /root/.config/google-assistant-library/assistant
 fi
 
-/root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
-
 ACCESS_TOKEN=/share/gawebserver/access_token.json
 CLIENT_SECRET=/share/gawebserver/client_secret.json
+
+/root/ascii2utf8.sh && echo "[Info] change assistant.py for using UTF-8"
 
 if [ ! -f "$ACCESS_TOKEN" ] && [ -f "$CLIENT_SECRET" ]; then
     echo "[Info] Start WebUI for handling oauth2"
