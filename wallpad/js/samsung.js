@@ -216,18 +216,20 @@ else{
 	    baudRate: CONFIG.serial.baudrate,
 	    dataBits: 8,
 	    parity: CONFIG.serial.parity,
-		stopBits: 1,
-		autoOpen: false,
-		encoding: 'hex'
+	    stopBits: 1,
+	    autoOpen: false,
+	    encoding: 'hex'
 	});
+
 	const parser = port.pipe(new CustomParser());
 
 	port.on('open', () => log('[Serial] Success open port:', CONST.portName));
 	port.open((err) => {
 		if (err) {
-			return log('Error opening port:', err.message)
+			return log('Error opening port:', err.message);
 		}
-	})
+	});
+
 }
 //////////////////////////////////////////////////////////////////////////////////////
 // 홈넷에서 SerialPort로 상태 정보 수신
