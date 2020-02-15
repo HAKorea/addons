@@ -1,7 +1,7 @@
 #ARG BUILD_FROM=multiarch/debian-debootstrap:amd64-stretch
 ARG BUILD_FROM
 FROM $BUILD_FROM
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND noninteractive
 # Install packages
 RUN apt-get update 
 RUN apt-get install -y jq tzdata python3 python3-dev python3-pip \
