@@ -46,6 +46,19 @@ Add-on configuration:
 ### Option: `model_id` (필수)
 구글 어시스턴트 모델 id입니다. [네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant/661) 설정기를 참고
 
+### configuration.yaml 추가
+아래와 같이 설정해줍니다.
+
+```yaml
+notify:
+  - name: ga_broadcast
+    platform: rest
+    resource: http://containerip:5000/broadcast_message
+  - name: ga_command
+    platform: rest
+    resource: http://containerip:5000/command
+```
+
 ## Support
 
 궁금한 점이 있으신가요??
