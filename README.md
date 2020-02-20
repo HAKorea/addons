@@ -8,7 +8,7 @@
 커스텀파일 설정이 가능해서 본인이 사용하는 nodejs 파일이 있다면 교체해서 쓰시면 됩니다.
 [네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant)
 
-## Version : 0.8.1
+## Version : 0.8.2
 
 ## Installation
 
