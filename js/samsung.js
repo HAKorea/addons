@@ -198,6 +198,10 @@ client.on('connect', () => {
     client.subscribe(CONST.DEVICE_TOPIC, (err) => {if (err) log('MQTT Subscribe fail! -', CONST.DEVICE_TOPIC) });
 });
 
+
+let parser;
+let sock;
+let port;
 // Socket
 if(CONFIG.type == 'socket'){
 	// EW11 연결 (수정필요)        
