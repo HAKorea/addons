@@ -11,7 +11,8 @@
 
 const util = require('util');
 const SerialPort = require('serialport');
-const Delimiter = require('@serialport/parser-delimiter')
+const net = require('net');   // Socket
+const Delimiter = require('@serialport/parser-delimiter');
 const mqtt = require('mqtt');
 
 const CONFIG = require('/data/options.json');  //**** 애드온의 옵션을 불러옵니다. 이후 CONFIG.mqtt.username 과 같이 사용가능합니다. 
@@ -181,27 +182,44 @@ client.on('connect', () => {
     client.subscribe(CONST.DEVICE_TOPIC, (err) => {if (err) log('MQTT Subscribe fail! -', CONST.DEVICE_TOPIC) });
 });
 
-//////////////////////////////////////////////////////////////////////////////////////
-// SerialPort 모듈 초기화
-const port = new SerialPort(CONST.portName, {
-    baudRate: CONFIG.serial.baudrate,
-    dataBits: 8,
-    parity: CONFIG.serial.parity,
-    stopBits: 1,
-    autoOpen: false,
-    encoding: 'hex'
-});
 
-// F7 로 시작하고 AA 로 끝나서, 델리미터로 사용하여, 안의 데이터만 가져온다.
-//const parser = port.pipe(new Delimiter({ delimiter: [0xAA, 0xF7] }));
-const parser = port.pipe(new Delimiter({ delimiter: [0xAA] }));
+let parser;
+let sock;
+let port;
+// Socket
+if(CONFIG.type == 'socket'){
+  // EW11 연결 (수정필요)        
+  const sock = new net.Socket();                             
+  log('Initializing: SOCKET');                               
+  sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
+        log('[Socket] Success connect server');                     
+  }); 
+  const parser = sock.pipe(new CustomParser());   
+}
+else{
+  //-----------------------------------------------------------
+  // SerialPort 모듈 초기화
+  log('Initializing: SERIAL');  
+  const port = new SerialPort(CONST.portName, {
+      baudRate: CONFIG.serial.baudrate,
+      dataBits: 8,
+      parity: CONFIG.serial.parity,
+      stopBits: 1,
+      autoOpen: false,
+      encoding: 'hex'
+  });
 
-port.on('open', () => log('Success open port:', CONST.portName));
-port.open((err) => {
-    if (err) {
-        return log('Error opening port:', err.message);
-    }
-});
+  // F7 로 시작하고 AA 로 끝나서, 델리미터로 사용하여, 안의 데이터만 가져온다.
+  //const parser = port.pipe(new Delimiter({ delimiter: [0xAA, 0xF7] }));
+  const parser = port.pipe(new Delimiter({ delimiter: [0xAA] }));
+
+  port.on('open', () => log('Success open port:', CONST.portName));
+  port.open((err) => {
+      if (err) {
+          return log('Error opening port:', err.message);
+      }
+  });
+}
 //////////////////////////////////////////////////////////////////////////////////////
 // 홈넷에서 SerialPort로 상태 정보 수신
 parser.on('data', function (data) {
