@@ -71,7 +71,7 @@ Add-on configuration:
 // "type": "socket" 인 경우 내부 값을 모두 삭제 가능
 "serial": {}
 
-### Option: `socket` (옵션) - 아직 samsung 만 지원합니다. 테스트가 더 필요합니다. 
+### Option: `socket` (옵션) 
 "type": "socket" 로 설정한 경우 아래 옵션 사용
 
 * "deviceIP": "192.0.x.x"  // elfin과 같은 wifi to RS485 기기의 ip 주소
