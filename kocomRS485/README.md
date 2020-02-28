@@ -153,40 +153,40 @@ LOGLEVEL: info , debug, info, warn 중에 하나
 
 ### Option `KOCOM_LIGHT_SIZE` (optional)
 name은 방이름, number는 조명 개수. 본인의 집 수량만큼 추가 가능.
-
+```yaml
 KOCOM_LIGHT_SIZE:
   - name: livingroom
     number: 3
   - name: bedroom
     number: 2
-
+```
 ### Option `KOCOM_PLUG_SIZE` (optional)
 name은 방이름, number는 플러그 개수. 본인의 집 수량만큼 추가 가능.
-
+```yaml
 KOCOM_PLUG_SIZE:
   - name: livingroom
     number: 3
   - name: bedroom
     number: 2
-
+```
 ### Option `KOCOM_ROOM` (optional)
 방이름을 배열로 개수만큼 추가
-
+```yaml
 KOCOM_ROOM:
   - livingroom
   - bedroom
   - room1
-
+```
 방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1  등)을 확인하여 본인의 상황에 맞게 바꾸세요
 
 ### Option `KOCOM_ROOM_THERMOSTAT` (optional)
-
+```yaml
 KOCOM_ROOM_THERMOSTAT:
   - livingroom
   - bedroom
   - room1
-
+```
 조명/콘센트와 난방의 방패킷이 달라서 두개로 나뉘어있습니다.
 방 패킷에 따른 방이름 패킷 이름은 00부터 01, 02로 시작하는 순서와 방이름이 매칭되어야 함
 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1  등)을 확인하여 본인의 상황에 맞게 바꾸세요
