@@ -5,7 +5,7 @@
 ## About
 랜이님이 만든 코콤 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 1.0.3
+## Version : 1.0.4
 
 ## Installation
 
@@ -24,95 +24,69 @@
 
 Add-on configuration:
 
-```json
-{
-  "RS485": {
-    "type": "Serial"
-  },
-  "Socket": {
-    "server": "192.168.x.x",
-    "port": "xx"
-  },
-  "SocketDevice": {
-    "device": "kocom"
-  },
-  "Serial": {
-    "port1": "/dev/ttyUSB0"
-  },
-  "SerialDevice": {
-    "port1": "kocom"
-  },
-  "MQTT": {
-    "anonymous": false,
-    "server": "192.168.x.x",
-    "username": "id",
-    "password": "pw"
-  },
-  "Wallpad": {
-    "light": false,
-    "plug": false,
-    "thermostat": false,
-    "fan": false,
-    "gas": false,
-    "elevator": false
-  },
-  "Advanced": {
-    "INIT_TEMP": 22,
-    "SCAN_INTERVAL": 300,
-    "SCANNING_INTERVAL": 0.8,
-    "DEFAULT_SPEED" : "medium",
-    "LOGLEVEL" : "info"
-  },
-  "KOCOM_LIGHT_SIZE": [
-    {
-      "name": "livingroom",
-      "number": 3
-    },
-    {
-      "name": "bedroom",
-      "number": 2
-    },
-    {
-      "name": "room",
-      "number": 2
-    }
-    {
-      "name": "kitchen",
-      "number": 3
-    }
-  ],
-  "KOCOM_PLUG_SIZE": [
-    {
-      "name": "livingroom",
-      "number": 3
-    },
-    {
-      "name": "bedroom",
-      "number": 2
-    },
-    {
-      "name": "room",
-      "number": 2
-    },
-    {
-      "name": "kitchen",
-      "number": 3
-    }
-  ],
-  "KOCOM_ROOM": [
-    "livingroom",
-    "bedroom",
-    "room1",
-    "room2",
-    "kitchen"
-  ],
-  "KOCOM_ROOM_THERMOSTAT": [
-    "livingroom",
-    "bedroom",
-    "room1",
-    "room2"
-  ]
-}
+```yaml
+RS485:
+  type: Serial
+Socket:
+  server: 192.168.x.x
+  port: 8899
+SocketDevice:
+  device: kocom
+Serial:
+  port1: /dev/ttyUSB0
+SerialDevice:
+  port1: kocom
+MQTT:
+  anonymous: false
+  server: 192.168.x.x
+  username: id
+  password: pw
+Wallpad:
+  light: false
+  plug: false
+  thermostat: false
+  fan: false
+  gas: false
+  elevator: false
+Advanced:
+  INIT_TEMP: 22
+  SCAN_INTERVAL: 300
+  SCANNING_INTERVAL: 0.8
+  DEFAULT_SPEED: medium
+  LOGLEVEL: info
+KOCOM_LIGHT_SIZE:
+  - name: livingroom
+    number: 3
+  - name: bedroom
+    number: 2
+  - name: room1
+    number: 2
+  - name: room2
+    number: 2
+  - name: kitchen
+    number: 3
+KOCOM_PLUG_SIZE:
+  - name: livingroom
+    number: 3
+  - name: bedroom
+    number: 2
+  - name: room1
+    number: 2
+  - name: room2
+    number: 2
+  - name: kitchen
+    number: 3
+KOCOM_ROOM:
+  - livingroom
+  - bedroom
+  - room1
+  - room2
+  - kitchen
+KOCOM_ROOM_THERMOSTAT:
+  - livingroom
+  - bedroom
+  - room1
+  - room2
 ```
 
 ### Option: `RS485` (required)
@@ -122,7 +96,7 @@ type = Serial                    // Serial 혹은 Socket
 ### Option: `Socket` (required)
 
 server = 192.168.x.x           // Socket 쓸 경우 socket IP주소
-port = xx                        // Socket 쓸 경우 socket PORT
+port = 8899                        // Socket 쓸 경우 socket PORT번호
 
 ### Option: `SocketDevice` (required)
 
