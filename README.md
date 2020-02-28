@@ -29,28 +29,22 @@
 
 Add-on configuration:
 
-```json
-{
-    "model":"commax",
-    "type": "serial",
-    "sendDelay": 150,
-    "serial":{
-      "port": "/dev/ttyUSB0",
-      "baudrate": 9600,
-      "parity" : "none"
-    },
-    "socket" : {
-      "deviceIP": "192.0.0.1",
-      "port": 8899
-    },
-    "mqtt": {
-      "server": "192.168.x.x",
-      "username": "id",
-      "password": "pw",
-      "receiveDelay": 10000
-    },
-    "customfile": "mygateway.js"
-}
+```yaml
+model: commax
+type: serial
+sendDelay: 150
+serial:
+  port: /dev/ttyUSB0
+  baudrate: 9600
+  parity: none
+socket:
+  deviceIP: 192.0.0.1
+  port: 8899
+mqtt:
+  server: 192.168.x.x
+  username: id
+  password: pw
+  receiveDelay: 10000
 ```
 
 ### Option: `model` (필수)
