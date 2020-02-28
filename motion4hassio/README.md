@@ -11,28 +11,26 @@ Motion : https://motion-project.github.io/
 기본 설정은 Motion 과 동일하지만 일부 설정을 애드온에서 변경 가능하도록 제작했습니다.
 https://motion-project.github.io/motion_config.html
 
-```config
-{
-  "videodevice": "/dev/video0",
-  "width": 720,
-  "height": 480,
-  "framerate": 5,
-  "text_right": "%Y-%m-%d %T-%q",
-  "rotate": 0,
-  "target_dir": "/config/www/video",
-  "on_event_start": "/config/scripts/motion/start.sh",
-  "on_event_end": "/config/scripts/motion/end.sh",
-  "on_movie_end": "/config/scripts/motion/movie.sh %f",
-  "movie_output": "on",
-  "movie_max_time": 40,
-  "movie_quality": 80,
-  "movie_codec": "mp4",
-  "snapshot_interval": 0,
-  "snapshot_name": "%v-%Y%m%d%H%M%S-snapshot",
-  "picture_output": "off",
-  "picture_name": "%v-%Y%m%d%H%M%S-%q",
-  "webcontrol_local": "off"
-}
+```yaml
+videodevice: /dev/video0
+width: 720
+height: 480
+framerate: 5
+text_right: '%Y-%m-%d %T-%q'
+rotate: 0
+target_dir: /config/www/video
+on_event_start: /config/scripts/motion/start.sh
+on_event_end: /config/scripts/motion/end.sh
+on_movie_end: /config/scripts/motion/movie.sh %f
+movie_output: 'on'
+movie_max_time: 40
+movie_quality: 80
+movie_codec: mp4
+snapshot_interval: 0
+snapshot_name: '%v-%Y%m%d%H%M%S-snapshot'
+picture_output: 'off'
+picture_name: '%v-%Y%m%d%H%M%S-%q'
+webcontrol_local: 'off'
 ```
 
 on_event_start, on_event_end, on_movie_end 는 삭제 가능합니다. 
