@@ -12,6 +12,7 @@
 
  그레고리하우스님이 만든 코맥스 월패드 nodejs 프로그램을 애드온으로 포팅한 것입니다.
  기본적으로 코맥스로 동작하며 커스터마이징이 가능한 애드온으로 다른 아파트 nodejs 파일을 사용할 수 있습니다. 
+ 현재 삼성, 대림, 코맥스 월패드를 지원하면 ew11 같은 무선 소켓 연결도 지원합니다. 
 
 ### USB Video Connector Addon with Motion Server (motion4hassio)
 
@@ -20,6 +21,12 @@
 ### Owntracks Recorder for Hassio (owntracks4hassio)
  
 Owntracks Recorder를 애드온으로 만든 것입니다. ingress를 사용하여 사이드 패널에 추가할 수 있습니다. 
+
+### Google Assistant Webserver
+
+robwolff3가 만든 구글 어시스턴트 웹서버를 애드온으로 컨버팅한 것입니다. 
+구글 어시스턴트를 HA에서 텍스트 명령으로 컨트롤 할 수 있는 스위치, 자동화 등을 제작할 수 있습니다. 
+자세한 사용법은 [네이버 Homeassistant 카페 설정기](https://cafe.naver.com/koreassistant/661)를 참고하세요.
 
 
  
