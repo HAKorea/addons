@@ -55,36 +55,39 @@ mqtt:
 통신 방법: serial 또는 socket
 
 ### Option: `serial` (옵션)
-"type": "serial" 로 설정한 경우 아래 옵션 사용
+type: serial 로 설정한 경우 아래 옵션 사용
 
-* "port": "/dev/ttyUSB0" 	// 시리얼포트명
-* "baudrate": 9600 		// 시리얼 통신 속도
-* "parity" : "none"		// 패리티 체크 (none, even, odd 중 한 값)
-* "senddelay": 150		// 전송 딜레이 1/1000초 단위
+* port: /dev/ttyUSB0 	// 시리얼포트명
+* baudrate: 9600 		// 시리얼 통신 속도
+* parity : none		// 패리티 체크 (none, even, odd 중 한 값)
+* senddelay: 150		// 전송 딜레이 1/1000초 단위
 
-// "type": "socket" 인 경우 내부 값을 모두 삭제 가능
-"serial": {}
+// type: socket 인 경우 내부 값을 모두 삭제 가능
+
+serial: 
+을 제외한 하단 deviceIP랑 port 줄을 삭제할 수 있습니다.
 
 ### Option: `socket` (옵션) 
-"type": "socket" 로 설정한 경우 아래 옵션 사용
+type: socket 로 설정한 경우 아래 옵션 사용
 
-* "deviceIP": "192.0.x.x"  // elfin과 같은 wifi to RS485 기기의 ip 주소
-* "port": 8899    // elfin과 같은 wifi to RS485 기기의 port 주소
+* deviceIP: 192.0.x.x  // elfin과 같은 wifi to RS485 기기의 ip 주소
+* port: 8899    // elfin과 같은 wifi to RS485 기기의 port 주소
 
-// "type": "serial" 인 경우 내부 값을 모두 삭제 가능 
-"socket": {}
+// type: serial 인 경우 내부 값을 모두 삭제 가능 
+socket: 
+을 제외한 하단 deviceIP랑 port 줄을 삭제할 수 있습니다.
 
 ### Option `MQTT` (필수)
 
-* "server": "192.168.x.xx"	// MQTT 서버
-* "username": "id"			// MQTT ID
-* "password": "pw"			// MQTT PW
-* "receivedelay": 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
+* server: 192.168.x.xx	// MQTT 서버
+* username: id			// MQTT ID
+* password: pw			// MQTT PW
+* receivedelay: 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
 
 
 ### Option: `customefile` (옵션)
 
-"customfile": "mygateway.js" 와 같이 설정하고
+customfile: mygateway.js 와 같이 설정하고
 share/mygateway.js 파일을 넣어두면 애드온의 모든 설정을 무시하고 해당 파일로 nodejs를 실행합니다.
 로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
 
