@@ -48,7 +48,7 @@ mqtt:
 ```
 
 ### Option: `model` (필수)
-월패드 모델명을 입력합니다. 가능한 모델명은 commax , samsung , daelim 입니다.
+월패드 모델명을 입력합니다. 가능한 모델명은 commax , samsung , daelim , hyundai 입니다.
 다른 월패드의 nodejs 파일을 갖고 계신분은 [이곳 이슈][issue]로 올려주시면 반영하겠습니다.
 
 ### Option: `type` (필수)
