@@ -58,10 +58,10 @@ mqtt:
 type: serial 로 설정한 경우 아래 옵션 사용
 
 ```yaml
-  port: /dev/ttyUSB0 	  // 시리얼포트명
-  baudrate: 9600 		  // 시리얼 통신 속도
-  parity : none		  // 패리티 체크 (none, even, odd 중 한 값)
-  senddelay: 150 	      // 전송 딜레이 1/1000초 단위
+  port: /dev/ttyUSB0  // 시리얼포트명
+  baudrate: 9600    // 시리얼 통신 속도
+  parity : none   // 패리티 체크 (none, even, odd 중 한 값)
+  senddelay: 150    // 전송 딜레이 1/1000초 단위
 ```
 // type: socket 인 경우 내부 값을 모두 삭제 가능
 
@@ -80,10 +80,10 @@ socket:
 
 ### Option `MQTT` (필수)
 ```yaml
-  server: 192.168.x.xx	     // MQTT 서버
-  username: id			     // MQTT ID
-  password: pw			     // MQTT PW
-  receivedelay: 10000		 // 전송후 메시지 수신 지연 시간 1/1000초 단위
+  server: 192.168.x.xx   // MQTT 서버
+  username: id       // MQTT ID
+  password: pw       // MQTT PW
+  receivedelay: 10000		// 전송후 메시지 수신 지연 시간 1/1000초 단위
 ```
 
 ### Option: `customefile` (옵션)
