@@ -145,12 +145,12 @@ const CONST = {
 버그신고는 카페나 깃허브로 해주세요 [open an issue on our GitHub][issue].
 
 ## RELEASE NOTES
-
+```txt
 0.8.3 hyundai 월패드 수정
 0.8.2 타 월패드도 소켓 연결 추가. config 설명 json에서 yaml로 수정
 0.8.1 삼성 월패드 소켓 연결 추가 
 0.8 코맥스 월패드 테스트 완료
-
+```
 
 [forum]: https://cafe.naver.com/koreassistant
 [github]: https://github.com/HAKorea/addons
