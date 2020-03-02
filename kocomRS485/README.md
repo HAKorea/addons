@@ -90,33 +90,32 @@ KOCOM_ROOM_THERMOSTAT:
 ```
 
 ### Option: `RS485` (required)
-
+```yaml
 type: Serial                    // Serial 혹은 Socket
-
+```
 ### Option: `Socket` (required)
-
+```yaml
 server: 192.168.x.x           // Socket 쓸 경우 socket IP주소
 port: 8899                        // Socket 쓸 경우 socket PORT번호
-
+```
 ### Option: `SocketDevice` (required)
-
+```yaml
 device: kocom               // socket 쓸 경우 월패드 이름{{장치이름}}
-
+```
 ### Option: `Serial` (required)
-
+```yaml
 port1: /dev/ttyUSB0        // serial 쓸 경우 (월패드 혹은 그렉스)의 장치경로 작성
 port2: /dev/ttyUSB1        // serial 쓸 경우 (월패드 혹은 그렉스)의 장치경로 작성
 port3: /dev/ttyUSB2        // serial 쓸 경우 (월패드 혹은 그렉스)의 장치경로 작성
-
+```
 port2, port3는 추가,삭제 가능
 
 ### Option `SerialDevice` (required)
-
-[SerialDevice]
+```yaml
 port1: kocom               // serial 쓸 경우 (월패드 이름 혹은 그렉스 이름) 작성{{장치이름}}
 port2: grex_ventilator     // serial 쓸 경우 (월패드 이름 혹은 그렉스 이름) 작성{{장치이름}}
 port3: grex_controller     // serial 쓸 경우 (월패드 이름 혹은 그렉스 이름) 작성{{장치이름}}
-
+```
 port2, port3는 추가,삭제 가능
 
 {{장치이름}}
@@ -125,34 +124,34 @@ grex_ventilator = 그렉스 환기장치
 grex_controller = 그렉스 환기장치의 리모콘(환기모드, 정지 등)
 
 ### Option `MQTT` (required)
-
+```yaml
 anonymous: false           // MQTT 설정
 server: 192.168.x.xx         // MQTT 서버
 username: id                 // MQTT ID
 password: pw                // MQTT PW
-
+```
 
 ### Option `Wallpad` (required)
-
+```yaml
 light: true                    // 조명 
 plug: true                    // 플러그 
 thermostat: true            // 난방 
 fan: true                     // 환기팬 
 gas: true                     // 가스 
 elevator: true               // 엘레베이터 
-
-true 혹은 false 대소문자 주의
+```
 
 ### Option `Advanced` (required)
-
-INIT_TEMP: 22 // 보일러 초기값
-SCAN_INTERVAL: 300 // 월패드의 상태값 조회 간격
-SCANNING_INTERVAL: 0.5 // 상태값 조회 시 패킷전송 간격
-DEFAULT_SPEED: medium //환풍기 초기속도 ['low', 'medium', 'high']
+```yaml
+INIT_TEMP: 22           // 보일러 초기값
+SCAN_INTERVAL: 300      // 월패드의 상태값 조회 간격
+SCANNING_INTERVAL: 0.5  // 상태값 조회 시 패킷전송 간격
+DEFAULT_SPEED: medium   //환풍기 초기속도 low, medium, high
 LOGLEVEL: info , debug, info, warn 중에 하나
-
+```
 ### Option `KOCOM_LIGHT_SIZE` (optional)
 name은 방이름, number는 조명 개수. 본인의 집 수량만큼 추가 가능.
+
 ```yaml
 KOCOM_LIGHT_SIZE:
   - name: livingroom
@@ -162,6 +161,7 @@ KOCOM_LIGHT_SIZE:
 ```
 ### Option `KOCOM_PLUG_SIZE` (optional)
 name은 방이름, number는 플러그 개수. 본인의 집 수량만큼 추가 가능.
+
 ```yaml
 KOCOM_PLUG_SIZE:
   - name: livingroom
@@ -171,6 +171,7 @@ KOCOM_PLUG_SIZE:
 ```
 ### Option `KOCOM_ROOM` (optional)
 방이름을 배열로 개수만큼 추가
+
 ```yaml
 KOCOM_ROOM:
   - livingroom
