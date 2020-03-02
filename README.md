@@ -80,7 +80,7 @@ socket:
 
 ### Option `MQTT` (필수)
 ```yaml
-  server: 192.168.x.xx   // MQTT 서버
+  server: 192.168.x.xx  // MQTT 서버
   username: id          // MQTT ID
   password: pw          // MQTT PW
   receivedelay: 10000	// 전송후 메시지 수신 지연 시간 1/1000초 단위
