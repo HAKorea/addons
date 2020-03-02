@@ -63,10 +63,7 @@ type: serial 로 설정한 경우 아래 옵션 사용
   parity : none       // 패리티 체크 (none, even, odd 중 한 값)
   senddelay: 150      // 전송 딜레이 1/1000초 단위
 ```
-// type: socket 인 경우 내부 값을 모두 삭제 가능
-
-serial: 
-을 제외한 하단 deviceIP랑 port 줄을 삭제할 수 있습니다.
+type: serial 인 경우 내부 값은 무시합니다.
 
 ### Option: `socket` (옵션) 
 type: socket 로 설정한 경우 아래 옵션 사용
@@ -74,9 +71,8 @@ type: socket 로 설정한 경우 아래 옵션 사용
   deviceIP: 192.0.x.x   // elfin과 같은 wifi to RS485 기기의 ip 주소
   port: 8899            // elfin과 같은 wifi to RS485 기기의 port 주소
 ```
-// type: serial 인 경우 내부 값을 모두 삭제 가능 
-socket: 
-을 제외한 하단 deviceIP랑 port 줄을 삭제할 수 있습니다.
+type: serial 인 경우 내부 값은 무시합니다.
+
 
 ### Option `MQTT` (필수)
 ```yaml
