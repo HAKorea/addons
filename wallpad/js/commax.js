@@ -141,9 +141,6 @@ client.on('connect', () => {
     client.subscribe(CONST.DEVICE_TOPIC, (err) => {if (err) log('MQTT Subscribe fail! -', CONST.DEVICE_TOPIC) });
 });
 
-
-
-
 //-----------------------------------------------------------
 // SerialPort 모듈 초기화
 log('Initializing: SERIAL');    
