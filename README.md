@@ -8,7 +8,7 @@
 커스텀파일 설정이 가능해서 본인이 사용하는 nodejs 파일이 있다면 교체해서 쓰시면 됩니다.
 [네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant)
 
-## Version : 0.8.3
+## Version : 0.8.4
 
 ## Installation
 
@@ -52,7 +52,8 @@ mqtt:
 다른 월패드의 nodejs 파일을 갖고 계신분은 [이곳 이슈][issue]로 올려주시면 반영하겠습니다.
 
 ### Option: `type` (필수)
-통신 방법: serial 또는 socket
+통신 방법: serial 또는 socket 
+socket은 samsung만 지원합니다. 
 
 ### Option: `serial` (옵션)
 type: serial 로 설정한 경우 아래 옵션 사용
