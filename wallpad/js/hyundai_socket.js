@@ -81,26 +81,39 @@ client.on('connect', () => {
 });
 
 
-
-//-----------------------------------------------------------
-// SerialPort 모듈 초기화
-log('Initializing: SERIAL');    
-const port = new SerialPort(CONST.portName, {
-    baudRate: CONFIG.serial.baudrate,
-    dataBits: 8,
-    parity: CONFIG.serial.parity,
-    stopBits: 1,
-    autoOpen: false,
-    encoding: 'hex'
-});
-const parser = port.pipe(new Delimiter({ delimiter: new Buffer([0xee]) }))
-port.on('open', () => log('Success open port:', CONST.portName));
-port.open((err) => {
-  if (err) {
-    return log('Error opening port:', err.message);
-  }
-});
-
+let parser;
+let sock;
+let port;
+// Socket
+if(CONFIG.type == 'socket'){
+  // EW11 연결 (수정필요)        
+  sock = new net.Socket();                             
+  log('Initializing: SOCKET');                               
+  sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
+        log('[Socket] Success connect server');                     
+  }); 
+  parser = sock.pipe(new Delimiter({ delimiter: new Buffer([0xee]) }));   
+}
+else{
+  //-----------------------------------------------------------
+  // SerialPort 모듈 초기화
+  log('Initializing: SERIAL');    
+  port = new SerialPort(CONST.portName, {
+      baudRate: CONFIG.serial.baudrate,
+      dataBits: 8,
+      parity: CONFIG.serial.parity,
+      stopBits: 1,
+      autoOpen: false,
+      encoding: 'hex'
+  });
+  parser = port.pipe(new Delimiter({ delimiter: new Buffer([0xee]) }))
+  port.on('open', () => log('Success open port:', CONST.portName));
+  port.open((err) => {
+    if (err) {
+      return log('Error opening port:', err.message);
+    }
+  });
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 
