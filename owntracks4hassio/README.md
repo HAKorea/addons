@@ -7,11 +7,11 @@ Owntracks Recorder Addon for Hassio
 
 config:
 ```yaml
-localHost: 0.0.0.0
-mqttServer: core-mosquitto
-mqttPort: 1883
-mqttUser: username
-mqttPassword: password
+	localHost: 0.0.0.0
+	mqttServer: core-mosquitto
+	mqttPort: 1883
+	mqttUser: username
+	mqttPassword: password
 ```
 ### Option `mqttUser` (required)
 
