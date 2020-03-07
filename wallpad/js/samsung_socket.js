@@ -199,42 +199,14 @@ client.on('connect', () => {
 });
 
 
-let parser;
-let sock;
-let port;
 // Socket
-if(CONFIG.type == 'socket'){
-	// EW11 연결 (수정필요)        
-	sock = new net.Socket();                             
-	log('Initializing: SOCKET');                               
-	sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
-	      log('[Socket] Success connect server');                     
-	}); 
-	parser = sock.pipe(new CustomParser());   
-}
-else{
-	//-----------------------------------------------------------
-	// SerialPort 모듈 초기화
-	log('Initializing: SERIAL');    
-	port = new SerialPort(CONST.portName, {
-	    baudRate: CONFIG.serial.baudrate,
-	    dataBits: 8,
-	    parity: CONFIG.serial.parity,
-	    stopBits: 1,
-	    autoOpen: false,
-	    encoding: 'hex'
-	});
-
-	parser = port.pipe(new CustomParser());
-
-	port.on('open', () => log('[Serial] Success open port:', CONST.portName));
-	port.open((err) => {
-		if (err) {
-			return log('Error opening port:', err.message);
-		}
-	});
-
-}
+// EW11 연결 (수정필요)        
+const sock = new net.Socket();                             
+log('Initializing: SOCKET');                               
+sock.connect(CONFIG.socket.port, CONFIG.socket.deviceIP, function() {             
+      log('[Socket] Success connect server');                     
+}); 
+const parser = sock.pipe(new CustomParser());   
 //////////////////////////////////////////////////////////////////////////////////////
 // 홈넷에서 SerialPort로 상태 정보 수신
 parser.on('data', function (data) {

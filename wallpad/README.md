@@ -64,7 +64,7 @@ type: serial 로 설정한 경우 아래 옵션 사용
   parity : none       // 패리티 체크 (none, even, odd 중 한 값)
   senddelay: 150      // 전송 딜레이 1/1000초 단위
 ```
-type: serial 인 경우 내부 값은 무시합니다.
+socket을 사용하는 경우 위 값은 무시합니다.
 
 ### Option: `socket` (옵션) 
 type: socket 로 설정한 경우 아래 옵션 사용
@@ -72,7 +72,8 @@ type: socket 로 설정한 경우 아래 옵션 사용
   deviceIP: 192.0.x.x   // elfin과 같은 wifi to RS485 기기의 ip 주소
   port: 8899            // elfin과 같은 wifi to RS485 기기의 port 주소
 ```
-type: serial 인 경우 내부 값은 무시합니다.
+serial을 사용하는 경우 위 값은 무시합니다. 
+본 애드온에서는 코맥스는 socket을 지원 안합니다. 코맥스 소켓은 [HA카페 사람님의 애드온](https://cafe.naver.com/koreassistant/733)을 참고하세요.
 
 
 ### Option `MQTT` (필수)
