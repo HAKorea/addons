@@ -799,6 +799,7 @@ class Kocom(rs485):
             if not self.connected:
                 logger.debug('[ERROR] 서버 연결이 끊어져 get_serial Thread를 종료합니다.')
                 break
+            time.sleep(0.2)
 
     def check_sum(self, packet):
         sum_packet = sum(bytearray.fromhex(packet)[:17])
@@ -973,6 +974,7 @@ class Kocom(rs485):
             if not self.connected:
                 logger.debug('[ERROR] 서버 연결이 끊어져 scan_list Thread를 종료합니다.')
                 break
+            time.sleep(0.2)
 
     def set_serial(self, device, room, target, value, cmd='상태'):
         if (time.time() - self.tick) < KOCOM_INTERVAL / 1000:
@@ -1284,6 +1286,7 @@ class Grex:
                         self.packet_parsing(joindata, packet_name)
                     buf = []
                     start_flag = False
+            time.sleep(0.2)
 
     def packet_parsing(self, packet, packet_name):
         p_prefix = packet[:4]
@@ -1535,3 +1538,4 @@ if __name__ == '__main__':
                     connection_flag = False
         if _grex_ventilator is not False and _grex_controller is not False:
             _grex = Grex(r, _grex_controller, _grex_ventilator)
+        time.sleep(0.2)
