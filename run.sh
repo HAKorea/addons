@@ -25,6 +25,11 @@ else
 	ln -s /share/gawebserver/assistant /root/.config/google-assistant-library/assistant
 fi
 
+if [ -f /share/gawebserver/.asoundrc ]; then
+	echo "[Info] Copy .asoundrc to root"
+	cp /share/gawebserver/.asoundrc /root/
+fi
+
 ACCESS_TOKEN=/share/gawebserver/access_token.json
 CLIENT_SECRET=/share/gawebserver/client_secret.json
 
