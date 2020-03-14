@@ -59,10 +59,19 @@ notify:
     platform: rest
     resource: http://containerip:5000/command
 ```
+### 마이크 장치 필요
+이 애드온은 마이크 장치가 필요합니다. 마이크가 없는 기기에서는 
+sudo modprobe snd-dummy
+명령을 실행해주어야 합니다. root 권한을 사용하는 ssh 접속후 해당 명령을 실행하세요. 그러면 audio 설정에서 input/output에 dummy 장치가 나타납니다. 명령을 실행해도 dummy 장치가 나타나지 않는 경우에는 아래 asound 파일 설정법을 사용해보세요. 
 
 ### .asoundrc 설정
 필요한 경우 /share/gawebserver 폴더에 .asoundrc 파일을 추가할 수 있습니다. 
 /share/gawebserver/.asoundrc 가 존재하면 /root로 복사해서 사용합니다. 
+
+
+https://github.com/HAKorea/addons/blob/master/gawebserver/.asoundrc
+
+이 파일을 /share/gawebserver/.asoundrc로 넣어두시면 해당 파일을 복사해서 root로 옮깁니다. sudo modprobe snd-dummy 명령 실행후 audio에 input/output에 dummy가 나타나지 않는 경우 이 설정을 사용하세요. 
 
 ## Support
 
