@@ -26,7 +26,7 @@ robwolff3가 만든 구글 어시스턴트 웹서버를 애드온으로 컨버�
 7. 애드온 페이지에서 Config을 본인의 환경에 맞게 수정합니다.
 8. 별도로 구글 계정설정이 필요합니다. [네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant/661) 설정기를 참고하세요. 
 
-이 애드온은 용량이 600메가 정도로 좀 큽니다. 네트웍 속도와 컴퓨터의 성능에 따라 설치에 시간이 좀 걸릴 수 있습니다. Debian 이미지를 기초로 애드온을 Building 하는데 중간에 데비안 setup-tools 설치에 대한 Warning이 하나 나옵니다. Docker build에서는 문제가 되지 않지만 HA 애드온에서는 설치 과정에  Failed to install addon, [object Object] 라고 뜨고 진행하지 않는 경우가 생길 수 있습니다. 하지만 애드온은 계속 설치를 진행중이니 기다리시면 됩니다. 
+이 애드온은 용량이 600메가 정도로 좀 큽니다. 네트웍 속도와 컴퓨터의 성능에 따라 설치에 시간이 좀 걸릴 수 있습니다. Debian 이미지를 기초로 애드온을 Building 하는데 중간에 데비안 setup-tools 설치에 대한 Warning이 하나 나옵니다. Docker build에서는 문제가 되지 않지만 HA 애드온에서는 설치 과정에  Failed to install addon, [object Object] 라고 뜨고 진행하지 않는 경우가 생길 수 있습니다. 이경우 타임아웃 에러가 난 것인데 넉넉히 10분 기다리셨다가 다시 install 버튼을 누르면 설치가 완료됩니다. 정확하게 하려면 docker images 명령을 실행했을때 25b6f150/amd64-addon-gawebserver 이미지가 생성됐는지 파일 크기는 611MB 메가 정도인지 확인하고 install을 누르면 애드온이 잘 설치됩니다. 
 
 ## Configuration
 
