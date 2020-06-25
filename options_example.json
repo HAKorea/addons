@@ -1,0 +1,23 @@
+{
+	"entrance_mode": "full",
+	"wallpad_mode": "on",
+	"serial": {
+		"port":  "/dev/ttyUSB0",
+		"baudrate": 9600,
+		"bytesize": 8,
+		"parity": "E",
+		"stopbits": 1
+	},
+	"mqtt": {
+		"server": "127.0.0.1",
+		"port": 1883,
+		"need_login": false,
+		"user": "",
+		"passwd": ""
+	},
+	"rs485": {
+		"last_packet": "CE5A010015",
+		"max_retry": 20,
+		"early_response": 2
+	}
+}

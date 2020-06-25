@@ -1,0 +1,60 @@
+{
+	"version": "1",
+	"slug": "sds_wallpad",
+	"name": "Samsung SDS RS485 Addon with Virtual Entrance Switch",
+	"description": "삼성 SDS 월패드용 애드온입니다. 추가로 현관 스위치를 대신해서 엘리베이터 호출 및 가스밸브 차단 기능을 제공합니다.",
+	"url": "https://github.com/n-andflash/ha_addons",
+	"startup": "application",
+	"boot": "auto",
+	"arch": [ "armhf", "armv7", "aarch64", "amd64", "i386" ],
+
+	"auto_uart": true,
+	"map": [ "share:rw" ],
+
+	"options": {
+		"entrance_mode": "full",
+		"wallpad_mode": "on",
+		"serial": {
+			"port":  "/dev/ttyUSB0",
+			"baudrate": 9600,
+			"bytesize": 8,
+			"parity": "E",
+			"stopbits": 1
+		},
+		"mqtt": {
+			"server": "127.0.0.1",
+			"port": 1883,
+			"need_login": false,
+			"user": "",
+			"passwd": ""
+		},
+		"rs485": {
+			"last_packet": "CE5A010015",
+			"max_retry": 20,
+			"early_response": 2
+		}
+	},
+	"schema": {
+		"entrance_mode": "list(full|minimal|off)",
+		"wallpad_mode": "list(on|off)",
+		"serial": {
+			"port":  "str",
+			"baudrate": "int",
+			"bytesize": "int(5,8)",
+			"parity": "list(E|O|N|M|S)",
+			"stopbits": "int(0,3)"
+		},
+		"mqtt": {
+			"server": "str",
+			"port": "int(0,65535)",
+			"need_login": "bool",
+			"user": "str?",
+			"passwd": "str?"
+		},
+		"rs485": {
+			"last_packet": "str",
+			"max_retry": "int(0,100)",
+			"early_response": "int(0,2)"
+		}
+	}
+}
