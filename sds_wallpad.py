@@ -1,5 +1,6 @@
-# first written by Nandflash("저장장치") <github@printk.info> 2020-06-25
+# first written by Nandflash("저장장치") <github@printk.info> since 2020-06-25
 
+import socket
 import serial
 import paho.mqtt.client as paho_mqtt
 import json
@@ -98,8 +99,8 @@ STATE_HEADER = { prop['state']['header']:(device, prop['state']['length']) for d
 		if 'state' in prop }
 
 # human error를 로그로 찍기 위해서 그냥 전부 구독하자
-#SUB_LIST = { "sds/{}/+/+/command".format(device) for device in RS485_DEVICE } |\
-#		{ "sds/entrance/{}/trigger/command".format(trigger) for trigger in ENTRANCE_SWITCH['trigger'] }
+#SUB_LIST = { "{}/{}/+/+/command".format(Options['mqtt']['prefix'], device) for device in RS485_DEVICE } |\
+#		{ "{}/entrance/{}/trigger/command".format(Options['mqtt']['prefix'], trigger) for trigger in ENTRANCE_SWITCH['trigger'] }
 
 entrance_watch = {}
 entrance_trigger = {}
@@ -144,13 +145,14 @@ def mqtt_entrance(topics, payload):
 	entrance_ack[triggers[trigger]['ack']] = (trigger, payload)
 
 	# ON만 있는 명령은, 명령이 queue에 있는 동안 switch를 ON으로 표시
+	prefix = Options['mqtt']['prefix']
 	if 'OFF' not in triggers[trigger]:
-		topic = "sds/entrance/{}/state".format(trigger)
+		topic = "{}/entrance/{}/state".format(prefix, trigger)
 		print("publish to HA:  ", topic, "=", 'ON')
 		mqtt.publish(topic, 'ON')
 	# ON/OFF 있는 명령은, 마지막으로 받은 명령대로 표시
 	else:
-		topic = "sds/entrance/{}/state".format(trigger)
+		topic = "{}/entrance/{}/state".format(prefix, trigger)
 		print("publish to HA:  ", topic, "=", payload)
 		mqtt.publish(topic, payload, retain=True)
 
@@ -222,10 +224,11 @@ def start_mqtt_loop():
 		mqtt.username_pw_set(Options['mqtt']['user'], Options['mqtt']['passwd'])
 	mqtt.connect(Options['mqtt']['server'], Options['mqtt']['port'])
 
+	prefix = Options['mqtt']['prefix']
 	if Options['entrance_mode'] != 'off':
-		mqtt.subscribe("sds/entrance/+/command", 0)
+		mqtt.subscribe("{}/entrance/+/command".format(prefix), 0)
 	if Options['wallpad_mode'] != 'off':
-		mqtt.subscribe("sds/+/+/+/command", 0)
+		mqtt.subscribe("{}/+/+/+/command".format(prefix), 0)
 
 	mqtt.loop_start()
 
@@ -238,7 +241,8 @@ def entrance_pop(trigger, cmd):
 
 	# ON만 있는 명령은, 명령이 queue에서 빠지면 OFF로 표시
 	if 'OFF' not in triggers[trigger]:
-		topic = "sds/entrance/{}/state".format(trigger)
+		prefix = Options['mqtt']['prefix']
+		topic = "{}/entrance/{}/state".format(prefix, trigger)
 		print("publish to HA:  ", topic, "=", 'OFF')
 		mqtt.publish(topic, 'OFF')
 
@@ -260,7 +264,7 @@ def entrance_query(header):
 		# 하나 뽑아서 보내봄
 		trigger, cmd = next(iter(entrance_trigger))
 		resp = triggers[trigger][cmd].to_bytes(4, 'big')
-		ser.write(resp)
+		send(resp)
 
 		# retry count 관리, 초과했으면 제거
 		retry = entrance_trigger[trigger, cmd]
@@ -274,7 +278,7 @@ def entrance_query(header):
 	# full 모드일 때, 일상 응답
 	else:
 		resp = entrance_watch[header]
-		ser.write(resp)
+		send(resp)
 
 def entrance_clear(header):
 	query = ENTRANCE_SWITCH['default']['query']
@@ -286,7 +290,7 @@ def entrance_clear(header):
 	entrance_ack.pop(header, None)
 
 	# 뒷부분 꺼내서 버림
-	ser.read(2)
+	recv(2)
 
 def serial_verify_checksum(packet):
 	# 모든 byte를 XOR
@@ -361,7 +365,8 @@ def serial_receive_state(device, packet):
 	# MQTT topic 형태로 변환, 이전 상태와 같은지 한번 더 확인해서 무시하거나 publish
 	topic_list = {}
 	for attr, value in value_list:
-		topic = "sds/{}/{:x}/{}/state".format(device, id, attr)
+		prefix = Options['mqtt']['prefix']
+		topic = "{}/{}/{:x}/{}/state".format(prefix, device, id, attr)
 		if last_topic_list.get(topic) == value: continue
 
 		if attr != 'current': # 전력사용량이나 현재온도는 너무 자주 바뀌어서 로그 제외
@@ -377,12 +382,12 @@ def serial_get_header():
 	try:
 		# 0x80보다 큰 byte가 나올 때까지 대기
 		while 1:
-			header_0 = ser.read()[0]
+			header_0 = recv(1)[0]
 			if header_0 >= 0x80: break
 
 		# 중간에 corrupt되는 data가 있으므로 연속으로 0x80보다 큰 byte가 나오면 먼젓번은 무시한다
 		while 1:
-			header_1 = ser.read()[0]
+			header_1 = recv(1)[0]
 			if header_1 < 0x80: break
 			header_0 = header_1
 
@@ -406,7 +411,7 @@ def serial_send_command():
 
 	# 한번에 여러개 보내면 응답이랑 꼬여서 망함
 	cmd = next(iter(serial_queue))
-	ser.write(cmd)
+	send(cmd)
 
 	# retry count 관리, 초과했으면 제거
 	retry = serial_queue[cmd]
@@ -422,20 +427,34 @@ def serial_send_command():
 	else:
 		serial_queue[cmd] = retry - 1
 
-def serial_loop():
+def init_socket():
+	addr = Options['socket']['address']
+	port = Options['socket']['port']
+
+	soc = socket.socket()
+	soc.connect((addr, port))
+
+	global recv
+	global send
+	recv = soc.recv
+	send = soc.sendall
+
+def init_serial():
 	ser.port = Options['serial']['port']
 	ser.baudrate = Options['serial']['baudrate']
 	ser.bytesize = Options['serial']['bytesize']
 	ser.parity = Options['serial']['parity']
 	ser.stopbits = Options['serial']['stopbits']
 
-	try:
-		ser.close()
-		ser.open()
-	except:
-		print("The port is at use")
-		raise
+	ser.close()
+	ser.open()
 
+	global recv
+	global send
+	recv = ser.read
+	send = ser.write
+
+def serial_loop():
 	print("[Info] start loop ...")
 
 	while True:
@@ -461,7 +480,7 @@ def serial_loop():
 			device, length = STATE_HEADER[header]
 
 			# 해당 길이만큼 읽음
-			packet += ser.read(length - 2)
+			packet += recv(length - 2)
 
 			# checksum 오류 없는지 확인
 			if not serial_verify_checksum(packet): pass
@@ -471,7 +490,7 @@ def serial_loop():
 
 		elif header_0 == DEVICE_HEADER:
 			# 한 byte 더 뽑아서, 보냈던 명령의 ack인지 확인
-			header_2 = ser.read()[0]
+			header_2 = recv(1)[0]
 			header = (header << 8) | header_2
 
 			if header in serial_ack:
@@ -495,6 +514,10 @@ if __name__ == '__main__':
 
 	init_entrance()
 
+	if Options['serial_mode'] == 'socket':
+		init_socket()
+	else:
+		init_serial()
+
 	start_mqtt_loop()
 	serial_loop()
-

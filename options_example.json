@@ -1,4 +1,5 @@
 {
+	"serial_mode": "serial",
 	"entrance_mode": "full",
 	"wallpad_mode": "on",
 	"serial": {
@@ -8,12 +9,17 @@
 		"parity": "E",
 		"stopbits": 1
 	},
+	"socket": {
+		"address": "192.168.1.1",
+		"port": 8899
+	},
 	"mqtt": {
 		"server": "127.0.0.1",
 		"port": 1883,
 		"need_login": false,
 		"user": "",
-		"passwd": ""
+		"passwd": "",
+		"prefix": "sds"
 	},
 	"rs485": {
 		"last_packet": "CE5A010015",
