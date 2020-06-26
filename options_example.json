@@ -15,12 +15,12 @@
 	},
 	"mqtt": {
 		"discovery": true,
+		"prefix": "sds",
 		"server": "127.0.0.1",
 		"port": 1883,
 		"need_login": false,
 		"user": "",
-		"passwd": "",
-		"prefix": "sds"
+		"passwd": ""
 	},
 	"rs485": {
 		"last_packet": "CE5A010015",

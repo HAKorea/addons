@@ -9,8 +9,6 @@ RUN apk add --no-cache py3-pip
 RUN python3 -m pip install pyserial
 RUN python3 -m pip install paho-mqtt
 
-WORKDIR /share
-
 COPY . /srv
 RUN chmod a+x /srv/run_addon.sh
 

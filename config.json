@@ -28,6 +28,7 @@
 		},
 		"mqtt": {
 			"discovery": true,
+			"prefix": "sds",
 			"server": "127.0.0.1",
 			"port": 1883,
 			"need_login": false,
@@ -57,6 +58,7 @@
 		},
 		"mqtt": {
 			"discovery": "bool",
+			"prefix": "str",
 			"server": "str",
 			"port": "int(0,65535)",
 			"need_login": "bool",
