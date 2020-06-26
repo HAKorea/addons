@@ -5,6 +5,7 @@ import serial
 import paho.mqtt.client as paho_mqtt
 import json
 import sys
+import time
 
 ####################
 # 가상의 현관 스위치로 동작하는 부분
@@ -50,7 +51,7 @@ RS485_DEVICE = {
 	# 각방 난방 제어
 	'thermostat': {
 		'query':    { 'header': 0xAE7C, 'length':  8, 'id': 2, },
-		'state':    { 'header': 0xB07C, 'length':  8, 'id': 2, 'parse': {('power', 3, 'toggle'), ('target', 4, 'value'), ('current', 5, 'value')} },
+		'state':    { 'header': 0xB07C, 'length':  8, 'id': 2, 'parse': {('power', 3, 'heat_toggle'), ('target', 4, 'value'), ('current', 5, 'value')} },
 		'last':     { },
 
 		'power':    { 'header': 0xAE7D, 'length':  8, 'id': 2, 'pos': 3, },
@@ -68,7 +69,7 @@ RS485_DEVICE = {
 		},
 
 	# 일괄조명: 현관 스위치 살아있으면...
-	'blackout': {
+	'cutoff': {
 		'query':    { 'header': 0xAD52, 'length':  4, },
 		'state':    { 'header': 0xB052, 'length':  4, 'parse': {('power', 2, 'toggle')} }, # 1: 정상, 0: 일괄소등
 		'last':     { },
@@ -94,9 +95,92 @@ RS485_DEVICE = {
 		},
 }
 
+DISCOVERY_PAYLOAD = {
+	'light': [ {
+		'_type': 'light',
+		'~': "{prefix}/light",
+		'name': "_",
+		'stat_t': "~/{id}/power{bit}/state",
+		'cmd_t': "~/{id2}/power/command",
+		} ],
+	'fan': [ {
+		'_type': 'fan',
+		'~': "{prefix}/fan/{id}",
+		'name': "{prefix}_fan_{id}",
+		'stat_t': "~/power/state",
+		'cmd_t': "~/power/command",
+		'spd_stat_t': "~/speed/state",
+		'spd_cmd_t': "~/speed/command",
+		'pl_on': 5,
+		'pl_off': 6,
+		'pl_lo_spd': 3,
+		'pl_med_spd': 2,
+		'pl_hi_spd': 1,
+		'spds': ['low', 'medium', 'high'],
+		} ],
+	'thermostat': [ {
+		'_type': 'climate',
+		'~': "{prefix}/thermostat/{id}",
+		'name': "{prefix}_thermostat_{id}",
+		'mode_stat_t': "~/power/state",
+		'mode_cmd_t': "~/power/command",
+		'temp_stat_t': "~/target/state",
+		'temp_cmd_t': "~/target/command",
+		'curr_temp_t': "~/current/state",
+		'modes': [ 'off', 'heat' ],
+		'min_temp': 15,
+		'max_temp': 30,
+		} ],
+	'plug': [ {
+		'_type': 'switch',
+		'~': "{prefix}/plug/{id}/power",
+		'name': "{prefix}_plug_{id}",
+		'stat_t': "~/state",
+		'cmd_t': "~/command",
+		'icon': "mdi:power-plug",
+		},
+		{
+		'_type': 'switch',
+		'~': "{prefix}/plug/{id}/idlecut",
+		'name': "{prefix}_plug_{id}_standby_cutoff",
+		'stat_t': "~/state",
+		'cmd_t': "~/command",
+		'icon': "mdi:leaf",
+		},
+		{
+		'_type': 'sensor',
+		'~': "{prefix}/plug/{id}",
+		'name': "{prefix}_plug_{id}_power_usage",
+		'stat_t': "~/current/state",
+		'unit_of_meas': "W",
+		} ],
+	'cutoff': [ {
+		'_type': 'switch',
+		'~': "{prefix}/cutoff/{id}/power",
+		'name': "{prefix}_light_cutoff_{id}",
+		'stat_t': "~/state",
+		'cmd_t': "~/command",
+		} ],
+	'gas_valve': [ {
+		'_type': 'binary_sensor',
+		'~': "{prefix}/gas_valve/{id}",
+		'name': "{prefix}_gas_valve_{id}",
+		'stat_t': "~/current/state",
+		} ],
+	'energy': [ {
+		'_type': 'sensor',
+		'~': "{prefix}/plug/{id}",
+		'name': "_",
+		'stat_t': "~/current/state",
+		'unit_of_meas': "_",
+		} ]
+	}
+
 DEVICE_HEADER = 0xB0
 STATE_HEADER = { prop['state']['header']:(device, prop['state']['length']) for device, prop in RS485_DEVICE.items()
 		if 'state' in prop }
+QUERY_HEADER = { prop['query']['header']:(device, prop['query']['length']) for device, prop in RS485_DEVICE.items()
+		if 'query' in prop }
 
 # human error를 로그로 찍기 위해서 그냥 전부 구독하자
 #SUB_LIST = { "{}/{}/+/+/command".format(Options['mqtt']['prefix'], device) for device in RS485_DEVICE } |\
@@ -113,13 +197,15 @@ last_topic_list = {}
 
 ser = serial.Serial()
 mqtt = paho_mqtt.Client()
+mqtt_connected = False
 
 def init_entrance():
 	if Options['entrance_mode'] == 'full':
 		global entrance_watch
 		entrance_watch = { prop['header']:prop['resp'].to_bytes(4, 'big') for prop in ENTRANCE_SWITCH['default'].values() }
 		# full 모드에서 일괄소등 제어는 가상 현관스위치가 담당
-		RS485_DEVICE.pop('blackout')
+		STATE_HEADER.pop(RS485_DEVICE['cutoff']['state']['header'])
+		RS485_DEVICE.pop('cutoff')
 
 	elif Options['entrance_mode'] == 'minimal':
 		# minimal 모드에서 일괄소등은 월패드 애드온에서만 제어 가능
@@ -217,12 +303,20 @@ def mqtt_on_message(mqtt, userdata, msg):
 	else:
 		mqtt_device(topics, payload)
 
+def mqtt_on_connect(mqtt, userdata, flags, rc):
+	if rc == 0:
+		print("MQTT connect successful!")
+		global mqtt_connected
+		mqtt_connected = True
+	else:
+		print("MQTT connection return with: ", connack_string(rc))
+
 def start_mqtt_loop():
 	mqtt.on_message = mqtt_on_message
+	mqtt.on_connect = mqtt_on_connect
 
 	if Options['mqtt']['need_login']:
 		mqtt.username_pw_set(Options['mqtt']['user'], Options['mqtt']['passwd'])
-	mqtt.connect(Options['mqtt']['server'], Options['mqtt']['port'])
 
 	prefix = Options['mqtt']['prefix']
 	if Options['entrance_mode'] != 'off':
@@ -230,7 +324,16 @@ def start_mqtt_loop():
 	if Options['wallpad_mode'] != 'off':
 		mqtt.subscribe("{}/+/+/+/command".format(prefix), 0)
 
+	mqtt.connect(Options['mqtt']['server'], Options['mqtt']['port'])
+
 	mqtt.loop_start()
+
+	delay = 1
+	while not mqtt_connected:
+		print("waiting MQTT connected ...")
+		time.sleep(delay)
+		delay = min(delay*2, 30)
+	print("Done!")
 
 def entrance_pop(trigger, cmd):
 	query = ENTRANCE_SWITCH['default']['query']
@@ -244,7 +347,7 @@ def entrance_pop(trigger, cmd):
 		prefix = Options['mqtt']['prefix']
 		topic = "{}/entrance/{}/state".format(prefix, trigger)
 		print("publish to HA:  ", topic, "=", 'OFF')
-		mqtt.publish(topic, 'OFF')
+		mqtt.publish(topic, 'OFF', retain=True)
 
 	# minimal 모드일 때, 조용해질지 여부
 	if not entrance_trigger and Options['entrance_mode'] == 'minimal':
@@ -336,6 +439,8 @@ def serial_peek_value(parse, packet):
 		value = 'ON' if value & 0x10 else 'OFF'
 	elif pattern == 'fan_toggle':
 		value = 5 if value == 0 else 6
+	elif pattern == 'heat_toggle':
+		value = 'heat' if value & 1 else 'off'
 	elif pattern == 'value':
 		pass
 	elif pattern == '2Byte':
@@ -344,6 +449,44 @@ def serial_peek_value(parse, packet):
 		value = float(packet[pos:pos+3].hex()) / 100
 
 	return [(attr, value)]
+
+def serial_new_device(device, id, packet, last_query):
+	prefix = Options['mqtt']['prefix']
+
+	# 조명은 두 id를 조합해서 개수와 번호를 정해야 함
+	if device == 'light':
+		id2 = last_query[3]
+		num = id >> 4
+
+		for bit in range(1, num+1):
+			payload = DISCOVERY_PAYLOAD[device][0].copy()
+			payload['~'] = payload['~'].format(prefix=prefix, id=id)
+			payload['name'] = "{}_light_{}".format(prefix, id2+bit)
+			payload['stat_t'] = payload['stat_t'].format(id=id, bit=bit)
+			payload['cmd_t'] = payload['stat_t'].format(id2=id2+bit)
+
+			# discovery에 등록
+			topic = "homeassistant/{}/{}/config".format(payload['_type'], payload['name'])
+			payload.pop('_type')
+			print("Add new device: ", topic)
+			mqtt.publish(topic, json.dumps(payload), retain=True)
+
+	elif device in DISCOVERY_PAYLOAD:
+		for payloads in DISCOVERY_PAYLOAD[device]:
+			payload = payloads.copy()
+			payload['~'] = payload['~'].format(prefix=prefix, id=id)
+			payload['name'] = payload['name'].format(prefix=prefix, id=id)
+
+			# 실시간 에너지 사용량에는 적절한 이름과 단위를 붙여준다 (단위가 없으면 그래프로 출력이 안됨)
+			if device == 'energy':
+				payload['name'] = "{}_{}_consumption".format(prefix, ('power', 'gas', 'water')[id])
+				payload['unit_of_meas'] = ('Wh', 'm³', 'm³')[id]
+
+			# discovery에 등록
+			topic = "homeassistant/{}/{}/config".format(payload['_type'], payload['name'])
+			payload.pop('_type')
+			print("Add new device: ", topic)
+			mqtt.publish(topic, json.dumps(payload), retain=True)
 
 def serial_receive_state(device, packet):
 	form = RS485_DEVICE[device]['state']
@@ -355,7 +498,16 @@ def serial_receive_state(device, packet):
 		id = 1
 
 	# 해당 ID의 이전 상태와 같은 경우 바로 무시
-	if last.get(id) == packet: return
+	if last.get(id) == packet:
+		return
+	# 처음 받은 상태인 경우, discovery 용도로 등록한다.
+	elif Options['mqtt']['discovery'] and not last.get(id):
+		# 전등 때문에 last query도 필요... 지금 패킷과 일치하는지 검증
+		if last_query[1] == packet[1]:
+			serial_new_device(device, id, packet, last_query)
+			last[id] = packet
+	else:
+		last[id] = packet
 
 	# device 종류에 따라 전송할 데이터 정리
 	value_list = []
@@ -363,7 +515,6 @@ def serial_receive_state(device, packet):
 		value_list += serial_peek_value(parse, packet)
 
 	# MQTT topic 형태로 변환, 이전 상태와 같은지 한번 더 확인해서 무시하거나 publish
-	topic_list = {}
 	for attr, value in value_list:
 		prefix = Options['mqtt']['prefix']
 		topic = "{}/{}/{:x}/{}/state".format(prefix, device, id, attr)
@@ -372,11 +523,7 @@ def serial_receive_state(device, packet):
 		if attr != 'current': # 전력사용량이나 현재온도는 너무 자주 바뀌어서 로그 제외
 			print("publish to HA:   {} = {} ({})".format(topic, value, packet.hex()))
 		mqtt.publish(topic, value, retain=True)
-		topic_list[topic] = value
-
-	# 마지막 상태 기억
-	last[id] = packet
-	last_topic_list.update(topic_list)
+		last_topic_list[topic] = value
 
 def serial_get_header():
 	try:
@@ -496,13 +643,20 @@ def serial_loop():
 			if header in serial_ack:
 				serial_ack_command(header)
 
+		# 마지막으로 받은 query를 저장해둔다 (조명 discovery에 필요)
+		elif header in QUERY_HEADER:
+			# 나머지 더 뽑아서 저장
+			global last_query
+			packet = recv(QUERY_HEADER[header][1] - 2)
+			packet = header.to_bytes(2, 'big') + packet
+			last_query = packet
+
 		# 명령을 보낼 타이밍인지 확인
 		if format(header, 'x') == Options['rs485']['last_packet'][0:4].lower():
 			if serial_queue:
 				serial_send_command()
 
 if __name__ == '__main__':
-	print("The port is at use")
 	if len(sys.argv) == 1:
 		option_file = "./options_standalone.json"
 	else:
@@ -515,8 +669,10 @@ if __name__ == '__main__':
 	init_entrance()
 
 	if Options['serial_mode'] == 'socket':
+		print("initialize socket...")
 		init_socket()
 	else:
+		print("initialize serial...")
 		init_serial()
 
 	start_mqtt_loop()

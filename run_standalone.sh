@@ -20,7 +20,7 @@ python3 -m pip install --upgrade pip
 python3 -m pip install pyserial
 python3 -m pip install paho-mqtt
 
-if [ ! -f $SHARE_DIR/$OPTION_FILE ]; then
+if [ ! -f $OPTION_FILE ]; then
 	echo "copy $EXAMPLE_FILE to $OPTION_FILE! you should edit $OPTION_FILE from now on."
 	cp $EXAMPLE_FILE $OPTION_FILE
 fi

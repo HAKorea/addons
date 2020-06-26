@@ -27,6 +27,7 @@
 			"port": 8899
 		},
 		"mqtt": {
+			"discovery": true,
 			"server": "127.0.0.1",
 			"port": 1883,
 			"need_login": false,
@@ -55,6 +56,7 @@
 			"port": "int?"
 		},
 		"mqtt": {
+			"discovery": "bool",
 			"server": "str",
 			"port": "int(0,65535)",
 			"need_login": "bool",
