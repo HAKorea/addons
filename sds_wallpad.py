@@ -83,7 +83,7 @@ RS485_DEVICE = {
     "gas_valve": {
         "query":    { "header": 0xAB41, "length":  4, },
         #"state":    { "header": 0xB041, "length":  4, "parse": {("power", 2, "toggle")} }, # 0: 정상, 1: 차단; 0xB041은 공용 ack이므로 처리하기 복잡함
-        "state":    { "header": 0xAD56, "length":  4, "parse": {("power", 2, "toggle")} }, # 0: 정상, 1: 차단; 월패드가 현관 스위치에 보내주는 정보로 확인 가능
+        "state":    { "header": 0xAD56, "length":  4, "parse": {("power", 2, "gas_toggle")} }, # 0: 정상, 1: 차단; 월패드가 현관 스위치에 보내주는 정보로 확인 가능
         "last":     { },
 
         "power":    { "header": 0xAB78, "length":  4, }, # 0 으로 잠그기만 가능
@@ -188,10 +188,10 @@ DISCOVERY_PAYLOAD = {
 		"cmd_t": "~/command",
     } ],
     "gas_valve": [ {
-		"_type": "binary_sensor",
+		"_type": "sensor",
 		"~": "{prefix}/gas_valve/{id}",
 		"name": "{prefix}_gas_valve_{id}",
-		"stat_t": "~/current/state",
+		"stat_t": "~/power/state",
     } ],
     "energy": [ {
 		"_type": "sensor",
@@ -199,8 +199,8 @@ DISCOVERY_PAYLOAD = {
 		"name": "_",
 		"stat_t": "~/current/state",
 		"unit_of_meas": "_",
-    } ]
-    }
+    } ],
+}
 
 STATE_HEADER = {
     prop["state"]["header"]: (device, prop["state"]["length"])
@@ -506,6 +506,8 @@ def serial_peek_value(parse, packet):
         value = 5 if value == 0 else 6
     elif pattern == "heat_toggle":
         value = "heat" if value & 1 else "off"
+    elif pattern == "gas_toggle":
+        value = "차단" if value & 1 else "열림"
     elif pattern == "value":
         pass
     elif pattern == "2Byte":
@@ -576,7 +578,8 @@ def serial_receive_state(device, packet):
     # 처음 받은 상태인 경우, discovery 용도로 등록한다.
     elif Options["mqtt"]["discovery"] and not last.get(id):
         # 전등 때문에 last query도 필요... 지금 패킷과 일치하는지 검증
-        if last_query[1] == packet[1]:
+        # gas valve는 일치하지 않는다
+        if last_query[1] == packet[1] or device == "gas_valve":
             serial_new_device(device, id, packet, last_query)
             last[id] = packet
     else:
@@ -726,7 +729,8 @@ def serial_loop():
             packet += recv(length - 2)
 
             # checksum 오류 없는지 확인
-            if not serial_verify_checksum(packet): pass
+            if not serial_verify_checksum(packet):
+                continue
 
             # 적절히 처리한다
             serial_receive_state(device, packet)
