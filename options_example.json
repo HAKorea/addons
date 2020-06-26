@@ -23,7 +23,6 @@
 		"passwd": ""
 	},
 	"rs485": {
-		"last_packet": "CE5A010015",
 		"max_retry": 20,
 		"early_response": 2
 	}
