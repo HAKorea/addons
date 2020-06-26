@@ -77,9 +77,6 @@
 * serial/parity
   * E, O, N, M, S 중 하나 (Even, Odd, None, Mark, Space)
 
-* rs485/last\_packet
-  * RS485가 조용해지기 전 마지막으로 보이는 패킷을 입력해주세요. Ax/Bx/Cx 중 하나로 시작합니다.
-  
 * rs485/max\_retry
   * 실행한 명령에 대한 성공 응답을 받지 못했을 때, 몇번까지 재시도할지 설정합니다. 특히 "minimal" 모드인 경우 큰 값이 필요하지만, 3회 재시도에 2초 정도 걸리므로, 너무 크지 않은 값을 설정하세요.
 
