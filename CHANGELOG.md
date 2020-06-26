@@ -1,5 +1,3 @@
-# 삼성SDS 월패드 RS485 Add-on (엘리베이터 호출 지원) Changelog
-
 ## 수정 내역
 
 ### (latest)
