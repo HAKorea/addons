@@ -2,6 +2,11 @@
 
 ### (latest)
 
+#### 2.1
+
+* 실행 시 KeyError: 'prefix' 오류 수정
+* share로 복사하는 동작 삭제
+
 ### 2
 
 * serial 대신 socket 통신 지원 가능하도록 추가 (socket 사용 시 엘리베이터 호출은 지원하지 않음)
