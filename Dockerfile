@@ -1,8 +1,11 @@
-FROM python:3
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 ENV LANG C.UTF-8
 
-RUN python3 -m pip install --upgrade pip
+RUN apk add --no-cache python3
+RUN apk add --no-cache py3-pip
+
 RUN python3 -m pip install pyserial
 RUN python3 -m pip install paho-mqtt
 
