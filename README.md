@@ -39,7 +39,7 @@
 
 1. 홈어시스턴트의 Supervisor (혹은 Hass.io) --> Add-on store에서 우상단 메뉴( ⋮ ) 를 누른 후 "repositories" 선택합니다.
 2. "Add repository" 영역에 "https://github.com/n-andflash/ha_addons/" 입력 후 ADD 를 누릅니다.
-3. 하단에 나타난 "Samsung SDS RS485 Addon with Virtual Entrance Switch" 를 선택합니다.
+3. 하단에 나타난 "Samsung SDS RS485 Addon with Elevator Call" 을 선택합니다.
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
   * 회전하는 아이콘이 꺼졌는데도 START가 나타나지 않으면, 빨갛게 표시된 에러메시지와 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
 5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 환경에 맞게 설정을 구성 후 "SAVE" 를 누릅니다.

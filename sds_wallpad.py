@@ -317,13 +317,6 @@ def start_mqtt_loop():
 
 	if Options['mqtt']['need_login']:
 		mqtt.username_pw_set(Options['mqtt']['user'], Options['mqtt']['passwd'])
-
-	prefix = Options['mqtt']['prefix']
-	if Options['entrance_mode'] != 'off':
-		mqtt.subscribe("{}/entrance/+/command".format(prefix), 0)
-	if Options['wallpad_mode'] != 'off':
-		mqtt.subscribe("{}/+/+/+/command".format(prefix), 0)
-
 	mqtt.connect(Options['mqtt']['server'], Options['mqtt']['port'])
 
 	mqtt.loop_start()
@@ -334,6 +327,12 @@ def start_mqtt_loop():
 		time.sleep(delay)
 		delay = min(delay*2, 30)
 	print("Done!")
+
+	prefix = Options['mqtt']['prefix']
+	if Options['entrance_mode'] != 'off':
+		mqtt.subscribe("{}/entrance/+/command".format(prefix), 0)
+	if Options['wallpad_mode'] != 'off':
+		mqtt.subscribe("{}/+/+/+/command".format(prefix), 0)
 
 def entrance_pop(trigger, cmd):
 	query = ENTRANCE_SWITCH['default']['query']
@@ -457,13 +456,14 @@ def serial_new_device(device, id, packet, last_query):
 	if device == 'light':
 		id2 = last_query[3]
 		num = id >> 4
+		id = int('{:x}'.format(id))
 
-		for bit in range(1, num+1):
+		for bit in range(0, num):
 			payload = DISCOVERY_PAYLOAD[device][0].copy()
 			payload['~'] = payload['~'].format(prefix=prefix, id=id)
 			payload['name'] = "{}_light_{}".format(prefix, id2+bit)
-			payload['stat_t'] = payload['stat_t'].format(id=id, bit=bit)
-			payload['cmd_t'] = payload['stat_t'].format(id2=id2+bit)
+			payload['stat_t'] = payload['stat_t'].format(id=id, bit=bit+1)
+			payload['cmd_t'] = payload['cmd_t'].format(id2=id2+bit)
 
 			# discovery에 등록
 			topic = "homeassistant/{}/{}/config".format(payload['_type'], payload['name'])
