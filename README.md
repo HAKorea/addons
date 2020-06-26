@@ -54,10 +54,11 @@
 * 작성중
 * 일단은, options\_example.json 을 적절히 수정 후 run_standalone.sh 를 실행하면 됩니다.
 
-### 3. YAML 구성
+### 3. MQTT 통합 구성요소 설정
 
+* 버전 2부터 MQTT discovery를 지원하므로, yaml 파일을 일일이 설정할 필요가 없습니다.
+* 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어있다면, HA에 sds_XXX 형식의 장치들이 자동으로 추가됩니다.
 * 작성중...
-* 일단은, [sds_wallpad_example.yaml](sds_wallpad_example.yaml) 을 참조하세요.
 
 ### 4. Lovelace 구성
 
