@@ -95,6 +95,29 @@ RS485_DEVICE = {
 		},
 }
 
+DISCOVERY_ENTRANCE = [ {
+	'~': "{}/entrance/ev",
+	'name': "{}_elevator",
+	'stat_t': "~/state",
+	'cmd_t': "~/command",
+	'icon': "mdi:elevator",
+	},
+	{
+	'~': "{}/entrance/gas",
+	'name': "{}_gas_cutoff",
+	'stat_t': "~/state",
+	'cmd_t': "~/command",
+	'icon': "mdi:valve",
+	},
+	{
+	'~': "{}/entrance/light",
+	'name': "{}_entrance_all_light",
+	'stat_t': "~/state",
+	'cmd_t': "~/command",
+	'icon': "mdi:lightbulb-group-off",
+	},
+	]
+
 DISCOVERY_PAYLOAD = {
 	'light': [ {
 		'_type': 'light',
@@ -210,6 +233,20 @@ def init_entrance():
 	elif Options['entrance_mode'] == 'minimal':
 		# minimal 모드에서 일괄소등은 월패드 애드온에서만 제어 가능
 		ENTRANCE_SWITCH['trigger'].pop('light')
+
+def mqtt_add_entrance():
+	if Options['entrance_mode'] == 'off': return
+
+	prefix = Options['mqtt']['prefix']
+	for payloads in DISCOVERY_ENTRANCE:
+		payload = payloads.copy()
+		payload['~'] = payload['~'].format(prefix)
+		payload['name'] = payload['name'].format(prefix)
+
+		# discovery에 등록
+		topic = "homeassistant/switch/{}/config".format(payload['name'])
+		print("Add new device: ", topic)
+		mqtt.publish(topic, json.dumps(payload), retain=True)
 
 def mqtt_entrance(topics, payload):
 	triggers = ENTRANCE_SWITCH['trigger']
@@ -676,4 +713,6 @@ if __name__ == '__main__':
 		init_serial()
 
 	start_mqtt_loop()
+	mqtt_add_entrance()
+
 	serial_loop()
