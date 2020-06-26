@@ -2,6 +2,11 @@
 
 ### (latest)
 
+#### 2.2
+
+* 현관 스위치 기능들 discovery 추가
+* 전등 discovery 오류 수정
+
 #### 2.1
 
 * 실행 시 KeyError: 'prefix' 오류 수정
