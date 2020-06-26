@@ -154,7 +154,7 @@ DISCOVERY_PAYLOAD = {
         "temp_cmd_t": "~/target/command",
         "curr_temp_t": "~/current/state",
         "modes": [ "off", "heat" ],
-        "min_temp": 15,
+        "min_temp": 10,
         "max_temp": 30,
     } ],
     "plug": [ {
@@ -195,7 +195,7 @@ DISCOVERY_PAYLOAD = {
     } ],
     "energy": [ {
 		"_type": "sensor",
-		"~": "{prefix}/plug/{id}",
+		"~": "{prefix}/energy/{id}",
 		"name": "_",
 		"stat_t": "~/current/state",
 		"unit_of_meas": "_",
