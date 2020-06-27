@@ -2,6 +2,13 @@
 
 ### (latest)
 
+#### 2.5
+
+* gas_valve sensor 수정
+* checksum fail된 state는 반영하지 않도록 개선
+* 시작할때 가끔 last_query 없어서 죽는 현상 수정
+* 특정 option이 없으면 default값으로 시도하도록 개선
+
 #### 2.4
 
 * 실시간에너지 discovery 장치 오류 수정
