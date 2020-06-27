@@ -8,6 +8,7 @@ import json
 import sys
 import time
 import logging
+import os.path
 
 ####################
 # 가상의 현관 스위치로 동작하는 부분
@@ -245,12 +246,13 @@ def init_option(argv):
     else:
         option_file = argv[1]
 
-    # TODO TEMPORARY
-    default_file = "/srv/options_example.json"
-
     # configuration이 예전 버전이어도 최대한 동작 가능하도록,
     # 기본값에 해당하는 파일을 먼저 읽고나서 설정 파일로 업데이트 한다.
     global Options
+
+    default_file = os.path.join(os.path.dirname(option_file), "options_example.json")
+    print(option_file, default_file)
+
     with open(default_file) as f:
         Options = json.load(f)
     with open(option_file) as f:

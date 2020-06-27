@@ -14,8 +14,8 @@ if which apk >/dev/null; then
 	$SUDO apk add --no-cache python3
 	$SUDO apk add --no-cache py3-pip
 elif which apt >/dev/null; then
-	$SUDO apt install python3
-	$SUDO apt install python3-pip
+	$SUDO apt install -y python3
+	$SUDO apt install -y python3-pip
 fi
 
 python3 -m pip install --upgrade pip
