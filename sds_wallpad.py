@@ -251,7 +251,6 @@ def init_option(argv):
     global Options
 
     default_file = os.path.join(os.path.dirname(option_file), "options_example.json")
-    print(option_file, default_file)
 
     with open(default_file) as f:
         Options = json.load(f)
