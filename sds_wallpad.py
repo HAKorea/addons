@@ -98,6 +98,17 @@ RS485_DEVICE = {
     },
 }
 
+RS485_EVENT = {
+    "phone1": {
+        "header": 0xA5, "length": 4, "normal": 0x41, "last": {},
+        "text": { 0x41: "대기중", 0x3E: "대기중", 0x31: "현관", 0x32: "공동현관", }
+    },
+    "phone2": {
+        "header": 0xA6, "length": 4, "normal": 0x41, "last": {},
+        "text": { 0x41: "대기중", 0x3E: "대기중", 0x31: "현관", 0x32: "공동현관", }
+    },
+}
+
 DISCOVERY_ENTRANCE = [
     {
         "~": "{}/entrance/ev",
@@ -203,15 +214,34 @@ DISCOVERY_PAYLOAD = {
     } ],
 }
 
+DISCOVERY_EVENT = {
+    "phone1": {
+        "_type": "sensor",
+        "~": "{prefix}/phone1",
+        "name": "{prefix}_phone1",
+        "stat_t": "~/phone1/current/state",
+    },
+    "phone2": {
+        "_type": "sensor",
+        "~": "{prefix}/phone2",
+        "name": "{prefix}_phone2",
+        "stat_t": "~/phone1/current/state",
+    },
+}
+
 STATE_HEADER = {
-    prop["state"]["header"]: (device, prop["state"]["length"])
+    prop["state"]["header"]: (device, prop["state"]["length"] - 2)
     for device, prop in RS485_DEVICE.items()
     if "state" in prop
 }
 QUERY_HEADER = {
-    prop["query"]["header"]: (device, prop["query"]["length"])
+    prop["query"]["header"]: (device, prop["query"]["length"] - 2)
     for device, prop in RS485_DEVICE.items()
     if "query" in prop
+}
+EVENT_HEADER = {
+    prop["header"]: (event, prop["length"] - 2)
+    for event, prop in RS485_EVENT.items()
 }
 
 HEADER_0_STATE = 0xB0
@@ -601,6 +631,21 @@ def serial_new_device(device, id, packet):
             mqtt.publish(topic, json.dumps(payload), retain=True)
 
 
+def serial_new_event(device, packet):
+    prefix = Options["mqtt"]["prefix"]
+
+    if device in DISCOVERY_EVENT:
+        payload = DISCOVERY_EVENT[device]
+        payload["~"] = payload["~"].format(prefix=prefix, id=id)
+        payload["name"] = payload["name"].format(prefix=prefix, id=id)
+
+        # discovery에 등록
+        topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
+        payload.pop("_type")
+        logging.info("Add new device:  {}".format(topic))
+        mqtt.publish(topic, json.dumps(payload), retain=True)
+
+
 def serial_receive_state(device, packet):
     form = RS485_DEVICE[device]["state"]
     last = RS485_DEVICE[device]["last"]
@@ -613,8 +658,9 @@ def serial_receive_state(device, packet):
     # 해당 ID의 이전 상태와 같은 경우 바로 무시
     if last.get(id) == packet:
         return
+
     # 처음 받은 상태인 경우, discovery 용도로 등록한다.
-    elif Options["mqtt"]["discovery"] and not last.get(id):
+    if Options["mqtt"]["discovery"] and not last.get(id):
         # 전등 때문에 last query도 필요... 지금 패킷과 일치하는지 검증
         # gas valve는 일치하지 않는다
         if last_query[1] == packet[1] or device == "gas_valve":
@@ -639,6 +685,40 @@ def serial_receive_state(device, packet):
         mqtt.publish(topic, value, retain=True)
         last_topic_list[topic] = value
 
+
+def serial_receive_event(device, packet):
+    last = RS485_EVENT[device]["last"]
+    text = RS485_EVENT[device]["text"]
+    normal = RS485_EVENT[device]["normal"]
+
+    # 이전 상태와 같은 경우 바로 무시
+    if last == packet:
+        return
+
+    # 처음 받은 상태인 경우, discovery 용도로 등록한다.
+    if not last:
+        if Options["mqtt"]["discovery"]:
+            serial_new_event(device, packet)
+
+    # 이벤트 형식이므로, 평소 패킷이면 최초를 제외하고는 무시
+    elif packet[1] == normal:
+        last[id] = packet
+        return
+
+    last[id] = packet
+
+    # payload 결정
+    if packet[1] in text:
+        payload = text[packet[1]]
+    else:
+        payload = packet[1].hex()
+
+    # MQTT topic 형태로 변환, publish
+    prefix = Options["mqtt"]["prefix"]
+    topic = "{}/{}/1/event/state".format(prefix, device)
+
+    logging.info("publish to HA:   {} = {} ({})".format(topic, payload, packet.hex()))
+    mqtt.publish(topic, payload)
 
 def serial_get_header():
     try:
@@ -757,14 +837,14 @@ def serial_loop():
             entrance_clear(header)
 
         # device로부터의 state 응답이면 확인해서 필요시 HA로 전송해야 함
-        if header in STATE_HEADER:
+        elif header in STATE_HEADER:
             packet = bytes([header_0, header_1])
 
             # 몇 Byte짜리 패킷인지 확인
-            device, length = STATE_HEADER[header]
+            device, remain = STATE_HEADER[header]
 
             # 해당 길이만큼 읽음
-            packet += recv(length - 2)
+            packet += recv(remain)
 
             # checksum 오류 없는지 확인
             if not serial_verify_checksum(packet):
@@ -772,6 +852,23 @@ def serial_loop():
 
             # 적절히 처리한다
             serial_receive_state(device, packet)
+
+        # 초인종 -> 부엌,화장실 인터폰 패킷 캡처
+        elif header_0 in EVENT_HEADER:
+            packet = bytes([header_0, header_1])
+
+            # 몇 Byte짜리 패킷인지 확인
+            device, remain = EVENT_HEADER[header_0]
+
+            # 해당 길이만큼 읽음
+            packet += recv(remain)
+
+            # checksum 오류 없는지 확인
+            if not serial_verify_checksum(packet):
+                continue
+
+            # 적절히 처리한다
+            serial_receive_event(device, packet)
 
         elif header_0 == HEADER_0_STATE:
             # 한 byte 더 뽑아서, 보냈던 명령의 ack인지 확인
@@ -785,7 +882,7 @@ def serial_loop():
         elif header in QUERY_HEADER:
             # 나머지 더 뽑아서 저장
             global last_query
-            packet = recv(QUERY_HEADER[header][1] - 2)
+            packet = recv(QUERY_HEADER[header][1])
             packet = header.to_bytes(2, "big") + packet
             last_query = packet
 
