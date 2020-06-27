@@ -244,7 +244,9 @@ def init_option(argv):
         option_file = "./options_standalone.json"
     else:
         option_file = argv[1]
-    default_file = "./options_example.json"
+
+    # TODO TEMPORARY
+    default_file = "/srv/options_example.json"
 
     # configuration이 예전 버전이어도 최대한 동작 가능하도록,
     # 기본값에 해당하는 파일을 먼저 읽고나서 설정 파일로 업데이트 한다.
