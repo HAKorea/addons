@@ -420,8 +420,7 @@ def start_mqtt_loop():
     while not mqtt_connected:
         logging.info("waiting MQTT connected ...")
         time.sleep(delay)
-        delay = min(delay * 2, 30)
-    logging.info("Done!")
+        delay = min(delay * 2, 10)
 
     prefix = Options["mqtt"]["prefix"]
     if Options["entrance_mode"] != "off":
