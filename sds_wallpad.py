@@ -238,6 +238,36 @@ mqtt = paho_mqtt.Client()
 mqtt_connected = False
 
 
+def init_option(argv):
+    # option 파일 선택
+    if len(argv) == 1:
+        option_file = "./options_standalone.json"
+    else:
+        option_file = argv[1]
+    default_file = "./options_example.json"
+
+    # configuration이 예전 버전이어도 최대한 동작 가능하도록,
+    # 기본값에 해당하는 파일을 먼저 읽고나서 설정 파일로 업데이트 한다.
+    global Options
+    with open(default_file) as f:
+        Options = json.load(f)
+    with open(option_file) as f:
+        Options2 = json.load(f)
+
+    # 업데이트
+    for k, v in Options.items():
+        if type(v) is dict:
+            Options[k].update(Options2[k])
+            for k2 in Options[k].keys():
+                if k2 not in Options2[k].keys():
+                    logging.warning("no option for '{}/{}'! try default value...".format(k, k2))
+        else:
+            if k not in Options2:
+                logging.warning("no option for '{}'! try default value...".format(k))
+            else:
+                Options[k] = Options2[k]
+
+
 def init_entrance():
     if Options["entrance_mode"] == "full":
         global entrance_watch
@@ -796,20 +826,9 @@ def serial_loop():
 
 
 if __name__ == "__main__":
-    # logging 설정
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%H:%M:%S')
 
-    # option 파일 선택
-    if len(sys.argv) == 1:
-        option_file = "./options_standalone.json"
-    else:
-        option_file = sys.argv[1]
-
-    # option 로드
-    global Options
-    with open(option_file) as f:
-        Options = json.load(f)
-
+    init_option(sys.argv)
     init_entrance()
 
     if Options["serial_mode"] == "socket":
