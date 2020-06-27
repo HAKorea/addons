@@ -231,7 +231,7 @@ entrance_ack = {}
 serial_queue = {}
 serial_ack = {}
 
-last_query = bytes()
+last_query = int(0).to_bytes(2, 'big')
 last_topic_list = {}
 
 ser = serial.Serial()
