@@ -2,7 +2,7 @@
 
 ### (latest)
 
-#### 2.5
+#### 2.6
 
 * gas_valve sensor 수정
 * checksum fail된 state는 반영하지 않도록 개선
