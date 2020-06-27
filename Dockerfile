@@ -12,4 +12,6 @@ RUN python3 -m pip install paho-mqtt
 COPY . /srv
 RUN chmod a+x /srv/run_addon.sh
 
+WORKDIR /share
+
 CMD [ "/srv/run_addon.sh" ]

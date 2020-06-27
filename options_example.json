@@ -24,6 +24,11 @@
 	},
 	"rs485": {
 		"max_retry": 20,
-		"early_response": 2
+		"early_response": 2,
+		"dump_time": 0
+	},
+	"log": {
+		"to_file": true,
+		"filename": "/share/sds_wallpad.log"
 	}
 }

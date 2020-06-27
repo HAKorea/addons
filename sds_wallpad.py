@@ -8,6 +8,7 @@ import json
 import sys
 import time
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import os.path
 
 ####################
@@ -193,24 +194,24 @@ DISCOVERY_PAYLOAD = {
         "unit_of_meas": "W",
     } ],
     "cutoff": [ {
-		"_type": "switch",
-		"~": "{prefix}/cutoff/{id}/power",
-		"name": "{prefix}_light_cutoff_{id}",
-		"stat_t": "~/state",
-		"cmd_t": "~/command",
+        "_type": "switch",
+        "~": "{prefix}/cutoff/{id}/power",
+        "name": "{prefix}_light_cutoff_{id}",
+        "stat_t": "~/state",
+        "cmd_t": "~/command",
     } ],
     "gas_valve": [ {
-		"_type": "sensor",
-		"~": "{prefix}/gas_valve/{id}",
-		"name": "{prefix}_gas_valve_{id}",
-		"stat_t": "~/power/state",
+        "_type": "sensor",
+        "~": "{prefix}/gas_valve/{id}",
+        "name": "{prefix}_gas_valve_{id}",
+        "stat_t": "~/power/state",
     } ],
     "energy": [ {
-		"_type": "sensor",
-		"~": "{prefix}/energy/{id}",
-		"name": "_",
-		"stat_t": "~/current/state",
-		"unit_of_meas": "_",
+        "_type": "sensor",
+        "~": "{prefix}/energy/{id}",
+        "name": "_",
+        "stat_t": "~/current/state",
+        "unit_of_meas": "_",
     } ],
 }
 
@@ -261,12 +262,33 @@ entrance_ack = {}
 serial_queue = {}
 serial_ack = {}
 
-last_query = int(0).to_bytes(2, 'big')
+last_query = int(0).to_bytes(2, "big")
 last_topic_list = {}
 
 ser = serial.Serial()
 mqtt = paho_mqtt.Client()
 mqtt_connected = False
+
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%H:%M:%S")
+
+
+def init_logger():
+    logger.setLevel(logging.INFO)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+
+def init_logger_file():
+    if Options["log"]["to_file"]:
+        filename = Options["log"]["filename"]
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        handler = TimedRotatingFileHandler(os.path.abspath(Options["log"]["filename"]), interval=1, backupCount=7)
+        handler.setFormatter(formatter)
+        handler.suffix = '%Y%m%d'
+        logger.addHandler(handler)
 
 
 def init_option(argv):
@@ -290,14 +312,14 @@ def init_option(argv):
 
     # 업데이트
     for k, v in Options.items():
-        if type(v) is dict:
+        if type(v) is dict and k in Options2:
             Options[k].update(Options2[k])
             for k2 in Options[k].keys():
                 if k2 not in Options2[k].keys():
-                    logging.warning("no option for '{}/{}'! try default value...".format(k, k2))
+                    logging.warning("no configuration value for '{}:{}'! try default value ({})...".format(k, k2, Options[k][k2]))
         else:
             if k not in Options2:
-                logging.warning("no option for '{}'! try default value...".format(k))
+                logging.warning("no configuration value for '{}'! try default value ({})...".format(k, Options[k]))
             else:
                 Options[k] = Options2[k]
 
@@ -329,7 +351,7 @@ def mqtt_add_entrance():
 
         # discovery에 등록
         topic = "homeassistant/switch/{}/config".format(payload["name"])
-        logging.info("Add new device:  {}".format(topic))
+        logger.info("Add new device:  {}".format(topic))
         mqtt.publish(topic, json.dumps(payload), retain=True)
 
 
@@ -339,9 +361,9 @@ def mqtt_entrance(topics, payload):
 
     # HA에서 잘못 보내는 경우 체크
     if len(topics) != 4:
-        logging.error("    invalid topic length!"); return
+        logger.error("    invalid topic length!"); return
     if trigger not in triggers:
-        logging.error("    invalid trigger!"); return
+        logger.error("    invalid trigger!"); return
 
     # OFF가 없는데(ev, gas) OFF가 오면, 이전 ON 명령의 시도 중지
     if payload not in triggers[trigger]:
@@ -356,12 +378,12 @@ def mqtt_entrance(topics, payload):
     prefix = Options["mqtt"]["prefix"]
     if "OFF" not in triggers[trigger]:
         topic = "{}/entrance/{}/state".format(prefix, trigger)
-        logging.info("publish to HA:   {} = {}".format(topic, "ON"))
+        logger.info("publish to HA:   {} = {}".format(topic, "ON"))
         mqtt.publish(topic, "ON")
     # ON/OFF 있는 명령은, 마지막으로 받은 명령대로 표시
     else:
         topic = "{}/entrance/{}/state".format(prefix, trigger)
-        logging.info("publish to HA:   {} = {}".format(topic, payload))
+        logger.info("publish to HA:   {} = {}".format(topic, payload))
         mqtt.publish(topic, payload, retain=True)
 
     # 그동안 조용히 있었어도, 이젠 가로채서 응답해야 함
@@ -380,11 +402,11 @@ def mqtt_device(topics, payload):
 
     # HA에서 잘못 보내는 경우 체크
     if device not in RS485_DEVICE:
-        logging.error("    unknown device!"); return
+        logger.error("    unknown device!"); return
     if cmd not in RS485_DEVICE[device]:
-        logging.error("    unknown command!"); return
+        logger.error("    unknown command!"); return
     if payload == "":
-        logging.error("    no payload!"); return
+        logger.error("    no payload!"); return
 
     # ON, OFF인 경우만 1, 0으로 변환, 복잡한 경우 (fan 등) 는 yaml 에서 하자
     if payload == "ON": payload = "1"
@@ -418,7 +440,7 @@ def mqtt_on_message(mqtt, userdata, msg):
     topics = msg.topic.split("/")
     payload = msg.payload.decode()
 
-    logging.info("recv. from HA:   {} = {}".format(msg.topic, payload))
+    logger.info("recv. from HA:   {} = {}".format(msg.topic, payload))
 
     device = topics[1]
     if device == "entrance":
@@ -429,11 +451,11 @@ def mqtt_on_message(mqtt, userdata, msg):
 
 def mqtt_on_connect(mqtt, userdata, flags, rc):
     if rc == 0:
-        logging.info("MQTT connect successful!")
+        logger.info("MQTT connect successful!")
         global mqtt_connected
         mqtt_connected = True
     else:
-        logging.error("MQTT connection return with:  {}".format(connack_string(rc)))
+        logger.error("MQTT connection return with:  {}".format(connack_string(rc)))
 
 
 def start_mqtt_loop():
@@ -448,18 +470,18 @@ def start_mqtt_loop():
 
     delay = 1
     while not mqtt_connected:
-        logging.info("waiting MQTT connected ...")
+        logger.info("waiting MQTT connected ...")
         time.sleep(delay)
         delay = min(delay * 2, 10)
 
     prefix = Options["mqtt"]["prefix"]
     if Options["entrance_mode"] != "off":
         topic = "{}/entrance/+/command".format(prefix)
-        logging.info("subscribe {}".format(topic))
+        logger.info("subscribe {}".format(topic))
         mqtt.subscribe(topic, 0)
     if Options["wallpad_mode"] != "off":
         topic = "{}/+/+/+/command".format(prefix)
-        logging.info("subscribe {}".format(topic))
+        logger.info("subscribe {}".format(topic))
         mqtt.subscribe(topic, 0)
 
 
@@ -474,7 +496,7 @@ def entrance_pop(trigger, cmd):
     if "OFF" not in triggers[trigger]:
         prefix = Options["mqtt"]["prefix"]
         topic = "{}/entrance/{}/state".format(prefix, trigger)
-        logging.info("publish to HA:   {} = {}".format(topic, "OFF"))
+        logger.info("publish to HA:   {} = {}".format(topic, "OFF"))
         mqtt.publish(topic, "OFF", retain=True)
 
     # minimal 모드일 때, 조용해질지 여부
@@ -500,9 +522,9 @@ def entrance_query(header):
 
         # retry count 관리, 초과했으면 제거
         retry = entrance_trigger[trigger, cmd]
-        logging.info("send to wallpad: {} (life {})".format(resp.hex(), retry))
+        logger.info("send to wallpad: {} (life {})".format(resp.hex(), retry))
         if not retry:
-            logging.error("    {} max retry count exceeded!".format(resp.hex()))
+            logger.error("    {} max retry count exceeded!".format(resp.hex()))
             entrance_pop(trigger, cmd)
         else:
             entrance_trigger[trigger, cmd] = retry - 1
@@ -516,7 +538,7 @@ def entrance_query(header):
 def entrance_clear(header):
     query = ENTRANCE_SWITCH["default"]["query"]
 
-    logging.info("ack frm wallpad: {}".format(hex(header)))
+    logger.info("ack frm wallpad: {}".format(hex(header)))
 
     # 성공한 명령을 지움
     entrance_pop(*entrance_ack[header])
@@ -537,7 +559,7 @@ def serial_verify_checksum(packet):
 
     # checksum이 안맞으면 로그만 찍고 무시
     if checksum:
-        logging.warning("checksum fail! {}, {:02x}".format(packet.hex(), checksum))
+        logger.warning("checksum fail! {}, {:02x}".format(packet.hex(), checksum))
         return False
 
     # 정상
@@ -585,7 +607,7 @@ def serial_peek_value(parse, packet):
             value = float(packet[pos : pos+3].hex()) / 100
         except:
             # 어쩌다 깨지면 뻗음...
-            logging.warning("invalid packet, {} is not decimal".format(packet.hex()))
+            logger.warning("invalid packet, {} is not decimal".format(packet.hex()))
             value = 0
 
     return [(attr, value)]
@@ -610,7 +632,7 @@ def serial_new_device(device, id, packet):
             # discovery에 등록
             topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
             payload.pop("_type")
-            logging.info("Add new device:  {} ({}: {})".format(topic, last_query.hex(), packet.hex()))
+            logger.info("Add new device:  {} ({}: {})".format(topic, last_query.hex(), packet.hex()))
             mqtt.publish(topic, json.dumps(payload), retain=True)
 
     elif device in DISCOVERY_PAYLOAD:
@@ -627,7 +649,7 @@ def serial_new_device(device, id, packet):
             # discovery에 등록
             topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
             payload.pop("_type")
-            logging.info("Add new device:  {}".format(topic))
+            logger.info("Add new device:  {}".format(topic))
             mqtt.publish(topic, json.dumps(payload), retain=True)
 
 
@@ -642,7 +664,7 @@ def serial_new_event(device, packet):
         # discovery에 등록
         topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
         payload.pop("_type")
-        logging.info("Add new device:  {}".format(topic))
+        logger.info("Add new device:  {}".format(topic))
         mqtt.publish(topic, json.dumps(payload), retain=True)
 
 
@@ -681,7 +703,7 @@ def serial_receive_state(device, packet):
         if last_topic_list.get(topic) == value: continue
 
         if attr != "current":  # 전력사용량이나 현재온도는 너무 자주 바뀌어서 로그 제외
-            logging.info("publish to HA:   {} = {} ({})".format(topic, value, packet.hex()))
+            logger.info("publish to HA:   {} = {} ({})".format(topic, value, packet.hex()))
         mqtt.publish(topic, value, retain=True)
         last_topic_list[topic] = value
 
@@ -717,7 +739,7 @@ def serial_receive_event(device, packet):
     prefix = Options["mqtt"]["prefix"]
     topic = "{}/{}/1/event/state".format(prefix, device)
 
-    logging.info("publish to HA:   {} = {} ({})".format(topic, payload, packet.hex()))
+    logger.info("publish to HA:   {} = {} ({})".format(topic, payload, packet.hex()))
     mqtt.publish(topic, payload)
 
 def serial_get_header():
@@ -734,7 +756,7 @@ def serial_get_header():
             header_0 = header_1
 
     except (OSError, serial.SerialException):
-        logging.error("ignore exception!")
+        logger.error("ignore exception!")
         header_0 = header_1 = 0
 
     # 헤더 반환
@@ -742,7 +764,7 @@ def serial_get_header():
 
 
 def serial_ack_command(packet):
-    logging.info("ack from device: {} ({:x})".format(serial_ack[packet].hex(), packet))
+    logger.info("ack from device: {} ({:x})".format(serial_ack[packet].hex(), packet))
 
     # 성공한 명령을 지움
     if serial_ack[packet] in serial_queue:
@@ -757,9 +779,9 @@ def serial_send_command():
 
     # retry count 관리, 초과했으면 제거
     retry = serial_queue[cmd]
-    logging.info("send to device:  {} (life {})".format(cmd.hex(), retry))
+    logger.info("send to device:  {} (life {})".format(cmd.hex(), retry))
     if not retry:
-        logging.error("    cmd {} max retry count exceeded!".format(cmd.hex()))
+        logger.error("    cmd {} max retry count exceeded!".format(cmd.hex()))
         ack = bytearray(cmd[0:3])
         ack[0] = 0xB0
         ack = int.from_bytes(ack, "big")
@@ -768,6 +790,10 @@ def serial_send_command():
         serial_ack.pop(ack)
     else:
         serial_queue[cmd] = retry - 1
+
+
+def socket_set_timeout(a):
+    soc.settimeout(a)
 
 
 def init_socket():
@@ -779,15 +805,21 @@ def init_socket():
 
     global recv
     global send
+    global set_timeout
     recv = soc.recv
     send = soc.sendall
+    set_timeout = socket_set_timeout
 
     # 소켓에 뭐가 떠다니는지 확인
     soc.settimeout(5.0)
     data = recv(1)
     soc.settimeout(None)
     if not data:
-        logging.critical("no active packet at this socket!")
+        logger.critical("no active packet at this socket!")
+
+
+def serial_set_timeout(a):
+    ser.timeout = a
 
 
 def init_serial():
@@ -802,8 +834,10 @@ def init_serial():
 
     global recv
     global send
+    global set_timeout
     recv = ser.read
     send = ser.write
+    set_timeout = serial_set_timeout
 
     # 시리얼에 뭐가 떠다니는지 확인
     ser.timeout = 5
@@ -811,11 +845,11 @@ def init_serial():
     ser.timeout = None
 
     if not data:
-        logging.critical("no active packet at this serial port!")
+        logger.critical("no active packet at this serial port!")
 
 
 def serial_loop():
-    logging.info("start loop ...")
+    logger.info("start loop ...")
     loop_count = 0
     scan_count = 0
     send_aggressive = False
@@ -907,38 +941,70 @@ def serial_loop():
             if loop_count == 20:
                 # discovery: 가끔 비트가 튈때 이상한 장치가 등록되는걸 막기 위해, 시간제한을 둠
                 if Options["mqtt"]["discovery"]:
-                    logging.info("Add new device:  All done.")
+                    logger.info("Add new device:  All done.")
                     Options["mqtt"]["discovery"] = False
                 else:
-                    logging.info("running stable...")
+                    logger.info("running stable...")
 
                 # 스캔이 없거나 적으면, 명령을 내릴 타이밍을 못잡는걸로 판단, 아무때나 닥치는대로 보내봐야한다.
                 if Options["serial_mode"] == "serial" and scan_count < 10:
-                    logging.warning("    send aggressive mode!", scan_count)
+                    logger.warning("    send aggressive mode!", scan_count)
                     send_aggressive = True
 
         # 루프 카운트 세는데 실패하면 다른 걸로 시도해봄
         if loop_count == 0 and time.time() - start_time > 6:
-            logging.warning("check loop count fail: there are no {:X}! try {:X}...".format(HEADER_0_FIRST, header_0_first_candidate[-1]))
+            logger.warning("check loop count fail: there are no {:X}! try {:X}...".format(HEADER_0_FIRST, header_0_first_candidate[-1]))
             HEADER_0_FIRST = header_0_first_candidate.pop()
             start_time = time.time()
             scan_count = 0
 
 
-if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%H:%M:%S')
+def dump_loop():
+    dump_time = Options["rs485"]["dump_time"]
 
+    if dump_time > 0:
+        start_time = time.time()
+        logger.warning("packet dump for {} seconds!".format(dump_time))
+
+        set_timeout(1)
+        logs = []
+        while time.time() - start_time < dump_time:
+            data = recv(1024)
+            for b in data:
+                if b == 0xA1 or len(logs) > 500:
+                    logger.info("".join(logs))
+                    logs = ["{:02X}".format(b)]
+                elif b <= 0xA0: logs.append(   "{:02X}".format(b))
+                elif b == 0xFF: logs.append(   "{:02X}".format(b))
+                elif b == 0xB0: logs.append( ": {:02X}".format(b))
+                else:           logs.append(",  {:02X}".format(b))
+        logger.info("".join(logs))
+        logger.warning("dump done.")
+        set_timeout(None)
+
+
+if __name__ == "__main__":
+    # configuration 로드 및 로거 설정
+    init_logger()
     init_option(sys.argv)
+    init_logger_file()
+
+    # 설정에 따라 현관스위치와 월패드 패킷 겹치는 부분 정리
     init_entrance()
 
     if Options["serial_mode"] == "socket":
-        logging.info("initialize socket...")
+        logger.info("initialize socket...")
         init_socket()
     else:
-        logging.info("initialize serial...")
+        logger.info("initialize serial...")
         init_serial()
+
+    dump_loop()
 
     start_mqtt_loop()
     mqtt_add_entrance()
 
-    serial_loop()
+    try:
+        serial_loop()
+    except:
+        logger.exception("addon finished!")
