@@ -230,6 +230,7 @@ entrance_ack = {}
 serial_queue = {}
 serial_ack = {}
 
+last_query = bytes()
 last_topic_list = {}
 
 ser = serial.Serial()
@@ -390,9 +391,13 @@ def start_mqtt_loop():
 
     prefix = Options["mqtt"]["prefix"]
     if Options["entrance_mode"] != "off":
-        mqtt.subscribe("{}/entrance/+/command".format(prefix), 0)
+        topic = "{}/entrance/+/command".format(prefix)
+        logging.info("subscribe {}".format(topic))
+        mqtt.subscribe(topic, 0)
     if Options["wallpad_mode"] != "off":
-        mqtt.subscribe("{}/+/+/+/command".format(prefix), 0)
+        topic = "{}/+/+/+/command".format(prefix)
+        logging.info("subscribe {}".format(topic))
+        mqtt.subscribe(topic, 0)
 
 
 def entrance_pop(trigger, cmd):
@@ -523,7 +528,7 @@ def serial_peek_value(parse, packet):
     return [(attr, value)]
 
 
-def serial_new_device(device, id, packet, last_query):
+def serial_new_device(device, id, packet):
     prefix = Options["mqtt"]["prefix"]
 
     # 조명은 두 id를 조합해서 개수와 번호를 정해야 함
@@ -580,7 +585,7 @@ def serial_receive_state(device, packet):
         # 전등 때문에 last query도 필요... 지금 패킷과 일치하는지 검증
         # gas valve는 일치하지 않는다
         if last_query[1] == packet[1] or device == "gas_valve":
-            serial_new_device(device, id, packet, last_query)
+            serial_new_device(device, id, packet)
             last[id] = packet
     else:
         last[id] = packet
