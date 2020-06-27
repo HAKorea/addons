@@ -250,7 +250,8 @@ def init_option(argv):
     # 기본값에 해당하는 파일을 먼저 읽고나서 설정 파일로 업데이트 한다.
     global Options
 
-    default_file = os.path.join(os.path.dirname(option_file), "options_example.json")
+    # 기본값 파일은 .py 와 같은 경로에 있음
+    default_file = os.path.join(os.path.dirname(os.path.abspath(argv[0])), "options_example.json")
 
     with open(default_file) as f:
         Options = json.load(f)
