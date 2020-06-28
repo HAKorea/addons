@@ -9,10 +9,10 @@ COPY run.sh makeconf.sh rs485.py /
 
 # Install requirements for add-on
 RUN apk add --no-cache jq
-RUN apk add --no-cache python3 && \
-	if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
-	python -m pip install pyserial && \
-	python -m pip install paho-mqtt
+RUN apk add --no-cache jq
+RUN apk add --no-cache python3 py3-pip && \
+        python3 -m pip install pyserial && \
+        python3 -m pip install paho-mqtt
 
 WORKDIR /share
 
