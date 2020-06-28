@@ -13,7 +13,7 @@
 
 	"options": {
 		"serial_mode": "serial",
-		"entrance_mode": "full",
+		"entrance_mode": "off",
 		"wallpad_mode": "on",
 		"serial": {
 			"port":  "/dev/ttyUSB0",
