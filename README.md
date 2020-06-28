@@ -43,7 +43,10 @@
 3. 하단에 나타난 "Samsung SDS RS485 Addon with Elevator Call" 을 선택합니다.
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
   * 설치 중 오류가 발생하면 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
-5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 환경에 맞게 설정을 구성 후 "SAVE" 를 누릅니다.
+5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 아래 설정을 구성 후 "SAVE" 를 누릅니다.
+  * serial_mode (EW11 사용시 socket, 그 외의 경우 serial)
+  * serial/port 혹은 socket/address
+  * mqtt/server, mqtt/need_login
 6. "Info" 페이지로 돌아와서 "START" 로 시작합니다.
   * 첫 시작 시 회전 애니메이션이 사라질 때까지 기다려주세요.
 7. "Log" 페이지에서 정상 동작하는지 확인합니다.
@@ -64,14 +67,6 @@
 * 작성중...
 
 ## 설정
-
-* 처음 사용하시기 전에, 아래 배경색으로 강조된 다음 옵션들을 확인해 주세요.
-  * serial_mode
-  * entrance_mode
-  * serial: port (USB to RS485 사용 시)
-  * socket: address (EW11 사용 시)
-  * mqtt: server
-  * mqtt: need_login (Mosquitto 로그인 필요 시)
 
 ### mode:
 #### `serial_mode` (serial / socket)
