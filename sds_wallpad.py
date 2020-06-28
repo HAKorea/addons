@@ -285,7 +285,7 @@ def init_logger_file():
     if Options["log"]["to_file"]:
         filename = Options["log"]["filename"]
         os.makedirs(os.path.dirname(filename), exist_ok=True)
-        handler = TimedRotatingFileHandler(os.path.abspath(Options["log"]["filename"]), interval=1, backupCount=7)
+        handler = TimedRotatingFileHandler(os.path.abspath(Options["log"]["filename"]), when="midnight", backupCount=7)
         handler.setFormatter(formatter)
         handler.suffix = '%Y%m%d'
         logger.addHandler(handler)
