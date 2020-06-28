@@ -42,13 +42,13 @@
 2. "Add repository" 영역에 "https://github.com/n-andflash/ha_addons/" 입력 후 ADD 를 누릅니다.
 3. 하단에 나타난 "Samsung SDS RS485 Addon with Elevator Call" 을 선택합니다.
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
-  * 설치 중 오류가 발생하면 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
+    1. 설치 중 오류가 발생하면 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
 5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 아래 설정을 구성 후 "SAVE" 를 누릅니다.
-  * serial_mode (EW11 사용시 socket, 그 외의 경우 serial)
-  * serial/port 혹은 socket/address
-  * mqtt/server, mqtt/need_login
+    1. serial_mode (EW11 사용시 socket, 그 외의 경우 serial)
+    2. serial/port 혹은 socket/address
+    3. mqtt/server, mqtt/need_login
 6. "Info" 페이지로 돌아와서 "START" 로 시작합니다.
-  * 첫 시작 시 회전 애니메이션이 사라질 때까지 기다려주세요.
+    1. 첫 시작 시 회전 애니메이션이 사라질 때까지 기다려주세요.
 7. "Log" 페이지에서 정상 동작하는지 확인합니다.
 
 #### 방법 2: 별도 장치에서 설치, 실행
@@ -82,8 +82,7 @@
 * on: 일반적인 월패드 애드온 기능
 * off: 기존 애드온과 함께 쓰고 싶을 때. 이게 정상동작하는지 아직 테스트되지 않음
 
-### serial:
-* serial\_mode 가 serial 인 경우에만 필요합니다.
+### serial: (serial\_mode 가 serial 인 경우)
 
 #### `port`
 * Supervisor -> System -> HARDWARE 버튼을 눌러 serial에 적혀있는 장치 이름을 확인해서 적어주세요.
@@ -94,8 +93,7 @@
 * 기본값으로 두시면 됩니다.
 * 사용 가능한 parity: E, O, N, M, S (Even, Odd, None, Mark, Space)
 
-### socket:
-* serial\_mode 가 socket 인 경우에만 필요합니다.
+### socket: (serial\_mode 가 socket 인 경우)
 
 #### `address`
 * EW11의 IP를 적어주세요.
