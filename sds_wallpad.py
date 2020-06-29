@@ -737,7 +737,7 @@ def serial_receive_event(device, packet):
     if packet[1] in text:
         payload = text[packet[1]]
     else:
-        payload = packet[1].hex()
+        payload = hex(packet[1])
 
     # MQTT topic 형태로 변환, publish
     prefix = Options["mqtt"]["prefix"]
