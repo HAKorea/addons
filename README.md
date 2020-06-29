@@ -134,7 +134,7 @@
 * 버그/수정 제보 등 패킷 덤프가 필요할 때만 사용하세요.
 
 ### log:
-#### to_file (true / false)
+#### to\_file (true / false)
 * false로 설정하면 로그를 파일로 남기지 않습니다.
 
 #### filename (기본값: /share/sds_wallpad.log)
@@ -146,6 +146,8 @@
 [HomeAssistant 네이버 카페 (질문, 수정 제안 등)](https://cafe.naver.com/koreassistant)
 
 [Github issue 페이지 (버그 신고, 수정 제안 등)](https://github.com/n-andflash/ha_addons/issues)
+
+[삼성SDS 월패드 RS485 패킷 분석](DOCS_PACKETS.md)
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
