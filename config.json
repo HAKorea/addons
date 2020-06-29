@@ -15,6 +15,7 @@
 		"serial_mode": "serial",
 		"entrance_mode": "off",
 		"wallpad_mode": "on",
+		"doorbell_mode": "off",
 		"serial": {
 			"port":  "/dev/ttyUSB0",
 			"baudrate": 9600,
@@ -49,6 +50,7 @@
 		"serial_mode": "list(serial|socket)",
 		"entrance_mode": "list(full|minimal|off)",
 		"wallpad_mode": "list(on|off)",
+		"doorbell_mode": "list(on|off)",
 		"serial": {
 			"port":  "str",
 			"baudrate": "int",

@@ -20,6 +20,16 @@ ENTRANCE_SWITCH = {
         "query": { "header": 0xAD41, "resp": 0xB0560066, }, # 여기에 0xB0410071로 응답하면 gas valve 상태는 전달받지 않음
         "gas":   { "header": 0xAD56, "resp": 0xB0410071, }, # 0xAD41에 항상 0xB041로 응답하면 이게 실행될 일은 없음
         "light": { "header": 0xAD52, "resp": 0xB0520163, "ON": 0xB0520063, "OFF": 0xB0520162, },
+
+        # 인터폰: 공동현관 문열림 테스트
+        "pinit":  { "header": 0xA45A, "resp": 0xB05A006A, }, # 처음 전기가 들어왔거나 한동안 응답을 안했을 때, 이것부터 해야 함
+        "pquery": { "header": 0xA441, "resp": 0xB0410071, },
+        "pding":  { "header": 0xA432, "resp": 0xB0320002, }, # 초인종 눌림, ack
+                                                             # 통화 시작은 0xA441에 응답해야함
+        "pcall":  { "header": 0xA436, "resp": 0xB0420072, }, # 통화 시작 ack의 ack
+                                                             # 문열림은 0xA441에 응답해야함
+        "popen":  { "header": 0xA43B, "resp": 0xB0420072, }, # 문열림 ack의 ack
+        "pend":   { "header": 0xA43E, "resp": 0xB03E0608, }, # 상황 종료
     },
 
     # 0xAD41에 다르게 응답하는 방법들, 이 경우 월패드가 다시 ack를 보내준다
@@ -326,14 +336,21 @@ def init_option(argv):
 
 def init_entrance():
     if Options["entrance_mode"] == "full":
+        # 평상시 응답할 항목 등록
         global entrance_watch
         entrance_watch = {
             prop["header"]: prop["resp"].to_bytes(4, "big")
             for prop in ENTRANCE_SWITCH["default"].values()
         }
+
         # full 모드에서 일괄소등 제어는 가상 현관스위치가 담당
         STATE_HEADER.pop(RS485_DEVICE["cutoff"]["state"]["header"])
         RS485_DEVICE.pop("cutoff")
+
+        # 공동현관 문열림 테스트 관련 항목 제거
+        if Options["doorbell_mode"] != "on":
+            for t in ["pinit", "pquery", "pding", "pcall", "popen", "pend"]:
+                entrance_watch.pop(ENTRANCE_SWITCH["default"][t]["header"])
 
     elif Options["entrance_mode"] == "minimal":
         # minimal 모드에서 일괄소등은 월패드 애드온에서만 제어 가능
@@ -547,6 +564,15 @@ def entrance_query(header):
     else:
         resp = entrance_watch[header]
         send(resp)
+
+        # 공동현관 문열림 관련 (테스트중)
+        if Options["doorbell_mode"] == "on":
+            if header == 0xA432: # 초인종 눌림
+                entrance_watch[0xA441] = 0xB0360600 # 다음번에 통화 시작
+            elif header == 0xA436: # 통화 시작 성공
+                entrance_watch[0xA441] = 0xB03B000B # 다음번에 문열림
+            elif header == 0xA43B: # 문열림 성공
+                entrance_watch[0xA441] = 0xB0410071 # 일상으로 복귀
 
 
 def entrance_clear(header):
