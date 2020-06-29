@@ -871,7 +871,7 @@ def serial_loop():
             entrance_clear(header)
 
         # device로부터의 state 응답이면 확인해서 필요시 HA로 전송해야 함
-        elif header in STATE_HEADER:
+        if header in STATE_HEADER:
             packet = bytes([header_0, header_1])
 
             # 몇 Byte짜리 패킷인지 확인
