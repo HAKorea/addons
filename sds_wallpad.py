@@ -316,10 +316,10 @@ def init_option(argv):
             Options[k].update(Options2[k])
             for k2 in Options[k].keys():
                 if k2 not in Options2[k].keys():
-                    logging.warning("no configuration value for '{}:{}'! try default value ({})...".format(k, k2, Options[k][k2]))
+                    logger.warning("no configuration value for '{}:{}'! try default value ({})...".format(k, k2, Options[k][k2]))
         else:
             if k not in Options2:
-                logging.warning("no configuration value for '{}'! try default value ({})...".format(k, Options[k]))
+                logger.warning("no configuration value for '{}'! try default value ({})...".format(k, Options[k]))
             else:
                 Options[k] = Options2[k]
 
