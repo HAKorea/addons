@@ -824,6 +824,7 @@ def init_socket():
     addr = Options["socket"]["address"]
     port = Options["socket"]["port"]
 
+    global soc
     soc = socket.socket()
     soc.connect((addr, port))
 
@@ -847,6 +848,7 @@ def serial_set_timeout(a):
 
 
 def init_serial():
+    global ser
     ser.port = Options["serial"]["port"]
     ser.baudrate = Options["serial"]["baudrate"]
     ser.bytesize = Options["serial"]["bytesize"]
