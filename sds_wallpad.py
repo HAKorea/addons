@@ -372,7 +372,6 @@ def mqtt_entrance(topics, payload):
 
     # 오류 체크 끝났으면 queue 에 넣어둠
     entrance_trigger[(trigger, payload)] = Options["rs485"]["max_retry"]
-    entrance_ack[triggers[trigger]["ack"]] = (trigger, payload)
 
     # ON만 있는 명령은, 명령이 queue에 있는 동안 switch를 ON으로 표시
     prefix = Options["mqtt"]["prefix"]
@@ -424,16 +423,11 @@ def mqtt_device(topics, payload):
 
     if "id" in cmd: packet[cmd["id"]] = int(id)
 
+    # parity 생성 후 queue 에 넣어둠
     packet[-1] = serial_generate_checksum(packet)
-    ack = packet[0:3]
-    ack[0] = 0xB0
-
-    # queue 에 넣어둠
     packet = bytes(packet)
-    ack = int.from_bytes(ack, "big")
 
     serial_queue[packet] = Options["rs485"]["max_retry"]
-    serial_ack[ack] = packet
 
 
 def mqtt_on_message(mqtt, userdata, msg):
@@ -528,6 +522,7 @@ def entrance_query(header):
             entrance_pop(trigger, cmd)
         else:
             entrance_trigger[trigger, cmd] = retry - 1
+            entrance_ack[triggers[trigger]["ack"]] = (trigger, cmd)
 
     # full 모드일 때, 일상 응답
     else:
@@ -767,8 +762,7 @@ def serial_ack_command(packet):
     logger.info("ack from device: {} ({:x})".format(serial_ack[packet].hex(), packet))
 
     # 성공한 명령을 지움
-    if serial_ack[packet] in serial_queue:
-        serial_queue.pop(serial_ack[packet])
+    serial_queue.pop(serial_ack[packet], None)
     serial_ack.pop(packet)
 
 
@@ -777,19 +771,21 @@ def serial_send_command():
     cmd = next(iter(serial_queue))
     send(cmd)
 
+    ack = bytearray(cmd[0:3])
+    ack[0] = 0xB0
+    ack = int.from_bytes(ack, "big")
+
     # retry count 관리, 초과했으면 제거
     retry = serial_queue[cmd]
     logger.info("send to device:  {} (life {})".format(cmd.hex(), retry))
     if not retry:
         logger.error("    cmd {} max retry count exceeded!".format(cmd.hex()))
-        ack = bytearray(cmd[0:3])
-        ack[0] = 0xB0
-        ack = int.from_bytes(ack, "big")
 
         serial_queue.pop(cmd)
-        serial_ack.pop(ack)
+        serial_ack.pop(ack, None)
     else:
         serial_queue[cmd] = retry - 1
+        serial_ack[ack] = cmd
 
 
 def socket_set_timeout(a):
