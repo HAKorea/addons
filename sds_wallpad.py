@@ -394,6 +394,23 @@ def mqtt_entrance(topics, payload):
         if trigger in ENTRANCE_SWITCH["default"] and payload in ENTRANCE_SWITCH["default"][device]:
             entrance_watch[ENTRANCE_SWITCH["default"][device]["header"]] = ENTRANCE_SWITCH["default"][device][payload]
 
+
+def mqtt_debug(topics, payload):
+    device = topics[2]
+    command = topics[3]
+
+    if (device == "packet"):
+        if (command == "send"):
+            # parity는 여기서 재생성
+            packet = bytearray.fromhex(payload)
+            packet[-1] = 0
+            packet[-1] = serial_generate_checksum(packet)
+            packet = bytes(packet)
+
+            logger.info("prepare packet:  {}".format(packet.hex()))
+            serial_queue[packet] = Options["rs485"]["max_retry"]
+
+
 def mqtt_device(topics, payload):
     device = topics[1]
     idn = topics[2]
@@ -439,6 +456,8 @@ def mqtt_on_message(mqtt, userdata, msg):
     device = topics[1]
     if device == "entrance":
         mqtt_entrance(topics, payload)
+    elif device == "debug":
+        mqtt_debug(topics, payload)
     else:
         mqtt_device(topics, payload)
 
