@@ -139,13 +139,13 @@ DISCOVERY_PAYLOAD = {
         "_type": "light",
         "~": "{prefix}/light",
         "name": "_",
-        "stat_t": "~/{id}/power{bit}/state",
+        "stat_t": "~/{idn}/power{bit}/state",
         "cmd_t": "~/{id2}/power/command",
     } ],
     "fan": [ {
         "_type": "fan",
-        "~": "{prefix}/fan/{id}",
-        "name": "{prefix}_fan_{id}",
+        "~": "{prefix}/fan/{idn}",
+        "name": "{prefix}_fan_{idn}",
         "stat_t": "~/power/state",
         "cmd_t": "~/power/command",
         "spd_stat_t": "~/speed/state",
@@ -159,8 +159,8 @@ DISCOVERY_PAYLOAD = {
     } ],
     "thermostat": [ {
         "_type": "climate",
-        "~": "{prefix}/thermostat/{id}",
-        "name": "{prefix}_thermostat_{id}",
+        "~": "{prefix}/thermostat/{idn}",
+        "name": "{prefix}_thermostat_{idn}",
         "mode_stat_t": "~/power/state",
         "mode_cmd_t": "~/power/command",
         "temp_stat_t": "~/target/state",
@@ -172,43 +172,43 @@ DISCOVERY_PAYLOAD = {
     } ],
     "plug": [ {
         "_type": "switch",
-        "~": "{prefix}/plug/{id}/power",
-        "name": "{prefix}_plug_{id}",
+        "~": "{prefix}/plug/{idn}/power",
+        "name": "{prefix}_plug_{idn}",
         "stat_t": "~/state",
         "cmd_t": "~/command",
         "icon": "mdi:power-plug",
     },
     {
         "_type": "switch",
-        "~": "{prefix}/plug/{id}/idlecut",
-        "name": "{prefix}_plug_{id}_standby_cutoff",
+        "~": "{prefix}/plug/{idn}/idlecut",
+        "name": "{prefix}_plug_{idn}_standby_cutoff",
         "stat_t": "~/state",
         "cmd_t": "~/command",
         "icon": "mdi:leaf",
     },
     {
         "_type": "sensor",
-        "~": "{prefix}/plug/{id}",
-        "name": "{prefix}_plug_{id}_power_usage",
+        "~": "{prefix}/plug/{idn}",
+        "name": "{prefix}_plug_{idn}_power_usage",
         "stat_t": "~/current/state",
         "unit_of_meas": "W",
     } ],
     "cutoff": [ {
         "_type": "switch",
-        "~": "{prefix}/cutoff/{id}/power",
-        "name": "{prefix}_light_cutoff_{id}",
+        "~": "{prefix}/cutoff/{idn}/power",
+        "name": "{prefix}_light_cutoff_{idn}",
         "stat_t": "~/state",
         "cmd_t": "~/command",
     } ],
     "gas_valve": [ {
         "_type": "sensor",
-        "~": "{prefix}/gas_valve/{id}",
-        "name": "{prefix}_gas_valve_{id}",
+        "~": "{prefix}/gas_valve/{idn}",
+        "name": "{prefix}_gas_valve_{idn}",
         "stat_t": "~/power/state",
     } ],
     "energy": [ {
         "_type": "sensor",
-        "~": "{prefix}/energy/{id}",
+        "~": "{prefix}/energy/{idn}",
         "name": "_",
         "stat_t": "~/current/state",
         "unit_of_meas": "_",
@@ -218,15 +218,15 @@ DISCOVERY_PAYLOAD = {
 DISCOVERY_EVENT = {
     "phone1": {
         "_type": "sensor",
-        "~": "{prefix}/phone1",
+        "~": "{prefix}/phone1/{idn}",
         "name": "{prefix}_phone1",
-        "stat_t": "~/phone1/current/state",
+        "stat_t": "~/event/state",
     },
     "phone2": {
         "_type": "sensor",
-        "~": "{prefix}/phone2",
+        "~": "{prefix}/phone2/{idn}",
         "name": "{prefix}_phone2",
-        "stat_t": "~/phone1/current/state",
+        "stat_t": "~/event/state",
     },
 }
 
@@ -396,7 +396,7 @@ def mqtt_entrance(topics, payload):
 
 def mqtt_device(topics, payload):
     device = topics[1]
-    id = topics[2]
+    idn = topics[2]
     cmd = topics[3]
 
     # HA에서 잘못 보내는 경우 체크
@@ -421,7 +421,7 @@ def mqtt_device(topics, payload):
     packet[1] = cmd["header"] & 0xFF
     packet[cmd["pos"]] = int(float(payload))
 
-    if "id" in cmd: packet[cmd["id"]] = int(id)
+    if "id" in cmd: packet[cmd["id"]] = int(idn)
 
     # parity 생성 후 queue 에 넣어둠
     packet[-1] = serial_generate_checksum(packet)
@@ -608,20 +608,20 @@ def serial_peek_value(parse, packet):
     return [(attr, value)]
 
 
-def serial_new_device(device, id, packet):
+def serial_new_device(device, idn, packet):
     prefix = Options["mqtt"]["prefix"]
 
     # 조명은 두 id를 조합해서 개수와 번호를 정해야 함
     if device == "light":
         id2 = last_query[3]
-        num = id >> 4
-        id = int("{:x}".format(id))
+        num = idn >> 4
+        idn = int("{:x}".format(idn))
 
         for bit in range(0, num):
             payload = DISCOVERY_PAYLOAD[device][0].copy()
-            payload["~"] = payload["~"].format(prefix=prefix, id=id)
+            payload["~"] = payload["~"].format(prefix=prefix, idn=idn)
             payload["name"] = "{}_light_{}".format(prefix, id2+bit)
-            payload["stat_t"] = payload["stat_t"].format(id=id, bit=bit+1)
+            payload["stat_t"] = payload["stat_t"].format(idn=idn, bit=bit+1)
             payload["cmd_t"] = payload["cmd_t"].format(id2=id2+bit)
 
             # discovery에 등록
@@ -633,13 +633,13 @@ def serial_new_device(device, id, packet):
     elif device in DISCOVERY_PAYLOAD:
         for payloads in DISCOVERY_PAYLOAD[device]:
             payload = payloads.copy()
-            payload["~"] = payload["~"].format(prefix=prefix, id=id)
-            payload["name"] = payload["name"].format(prefix=prefix, id=id)
+            payload["~"] = payload["~"].format(prefix=prefix, idn=idn)
+            payload["name"] = payload["name"].format(prefix=prefix, idn=idn)
 
             # 실시간 에너지 사용량에는 적절한 이름과 단위를 붙여준다 (단위가 없으면 그래프로 출력이 안됨)
             if device == "energy":
-                payload["name"] = "{}_{}_consumption".format(prefix, ("power", "gas", "water")[id])
-                payload["unit_of_meas"] = ("Wh", "m³", "m³")[id]
+                payload["name"] = "{}_{}_consumption".format(prefix, ("power", "gas", "water")[idn])
+                payload["unit_of_meas"] = ("Wh", "m³", "m³")[idn]
 
             # discovery에 등록
             topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
@@ -650,11 +650,12 @@ def serial_new_device(device, id, packet):
 
 def serial_new_event(device, packet):
     prefix = Options["mqtt"]["prefix"]
+    idn = 1
 
     if device in DISCOVERY_EVENT:
         payload = DISCOVERY_EVENT[device]
-        payload["~"] = payload["~"].format(prefix=prefix, id=id)
-        payload["name"] = payload["name"].format(prefix=prefix, id=id)
+        payload["~"] = payload["~"].format(prefix=prefix, idn=idn)
+        payload["name"] = payload["name"].format(prefix=prefix, idn=idn)
 
         # discovery에 등록
         topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
@@ -668,23 +669,27 @@ def serial_receive_state(device, packet):
     last = RS485_DEVICE[device]["last"]
 
     if form.get("id") != None:
-        id = packet[form["id"]]
+        idn = packet[form["id"]]
     else:
-        id = 1
+        idn = 1
 
     # 해당 ID의 이전 상태와 같은 경우 바로 무시
-    if last.get(id) == packet:
+    if last.get(idn) == packet:
         return
 
     # 처음 받은 상태인 경우, discovery 용도로 등록한다.
-    if Options["mqtt"]["discovery"] and not last.get(id):
+    if Options["mqtt"]["discovery"] and not last.get(idn):
         # 전등 때문에 last query도 필요... 지금 패킷과 일치하는지 검증
         # gas valve는 일치하지 않는다
         if last_query[1] == packet[1] or device == "gas_valve":
-            serial_new_device(device, id, packet)
-            last[id] = packet
+            serial_new_device(device, idn, packet)
+            last[idn] = True
+
+        # 장치 등록 먼저 하고, 상태 등록은 그 다음 턴에 한다. (난방 상태 등록 무시되는 현상 방지)
+        return
+
     else:
-        last[id] = packet
+        last[idn] = packet
 
     # device 종류에 따라 전송할 데이터 정리
     value_list = []
@@ -694,7 +699,7 @@ def serial_receive_state(device, packet):
     # MQTT topic 형태로 변환, 이전 상태와 같은지 한번 더 확인해서 무시하거나 publish
     for attr, value in value_list:
         prefix = Options["mqtt"]["prefix"]
-        topic = "{}/{}/{:x}/{}/state".format(prefix, device, id, attr)
+        topic = "{}/{}/{:x}/{}/state".format(prefix, device, idn, attr)
         if last_topic_list.get(topic) == value: continue
 
         if attr != "current":  # 전력사용량이나 현재온도는 너무 자주 바뀌어서 로그 제외
@@ -707,22 +712,26 @@ def serial_receive_event(device, packet):
     last = RS485_EVENT[device]["last"]
     text = RS485_EVENT[device]["text"]
     normal = RS485_EVENT[device]["normal"]
+    idn = 1
 
     # 이전 상태와 같은 경우 바로 무시
     if last == packet:
         return
 
     # 처음 받은 상태인 경우, discovery 용도로 등록한다.
-    if not last:
-        if Options["mqtt"]["discovery"]:
-            serial_new_event(device, packet)
+    if Options["mqtt"]["discovery"] and not last.get(idn):
+        serial_new_event(device, packet)
 
-    # 이벤트 형식이므로, 평소 패킷이면 최초를 제외하고는 무시
-    elif packet[1] == normal:
-        last[id] = packet
+        # 장치 등록 먼저 하고, 상태 등록은 그 다음 턴에 한다. (상태 등록 무시되는 현상 방지)
+        last[idn] = True
         return
 
-    last[id] = packet
+    # 이벤트 형식이므로, 평소 패킷이면 최초를 제외하고는 무시
+    elif last[idn] != True and packet[1] == normal:
+        last[idn] = packet
+        return
+
+    last[idn] = packet
 
     # payload 결정
     if packet[1] in text:
@@ -934,7 +943,7 @@ def serial_loop():
                     serial_send_command()
 
             # 돌만큼 돌았으면 상황 판단
-            if loop_count == 20:
+            if loop_count == 30:
                 # discovery: 가끔 비트가 튈때 이상한 장치가 등록되는걸 막기 위해, 시간제한을 둠
                 if Options["mqtt"]["discovery"]:
                     logger.info("Add new device:  All done.")
