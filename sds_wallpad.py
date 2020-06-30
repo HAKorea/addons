@@ -488,9 +488,14 @@ def mqtt_on_connect(mqtt, userdata, flags, rc):
         logger.error("MQTT connection return with:  {}".format(connack_string(rc)))
 
 
+def mqtt_on_disconnect(mqtt, userdata, rc):
+    logger.warning("MQTT disconnected! ({})".format(rc))
+
+
 def start_mqtt_loop():
     mqtt.on_message = mqtt_on_message
     mqtt.on_connect = mqtt_on_connect
+    mqtt.on_disconnect = mqtt_on_disconnect
 
     if Options["mqtt"]["need_login"]:
         mqtt.username_pw_set(Options["mqtt"]["user"], Options["mqtt"]["passwd"])
