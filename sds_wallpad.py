@@ -1,4 +1,4 @@
-# first written by Nandflash("저장장치") <github@printk.info> since 2020-06-25
+# first written by nandflash("저장장치") <github@printk.info> since 2020-06-25
 
 import socket
 import serial
