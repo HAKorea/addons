@@ -388,7 +388,7 @@ def mqtt_entrance(topics, payload):
         return
 
     # 오류 체크 끝났으면 queue 에 넣어둠
-    entrance_trigger[(trigger, payload)] = Options["rs485"]["max_retry"]
+    entrance_trigger[(trigger, payload)] = time.time()
 
     # ON만 있는 명령은, 명령이 queue에 있는 동안 switch를 ON으로 표시
     prefix = Options["mqtt"]["prefix"]
@@ -425,7 +425,7 @@ def mqtt_debug(topics, payload):
             packet = bytes(packet)
 
             logger.info("prepare packet:  {}".format(packet.hex()))
-            serial_queue[packet] = Options["rs485"]["max_retry"]
+            serial_queue[packet] = time.time()
 
 
 def mqtt_device(topics, payload):
@@ -461,7 +461,7 @@ def mqtt_device(topics, payload):
     packet[-1] = serial_generate_checksum(packet)
     packet = bytes(packet)
 
-    serial_queue[packet] = Options["rs485"]["max_retry"]
+    serial_queue[packet] = time.time()
 
 
 def mqtt_on_message(mqtt, userdata, msg):
@@ -555,14 +555,16 @@ def entrance_query(header):
         resp = triggers[trigger][cmd].to_bytes(4, "big")
         send(resp)
 
-        # retry count 관리, 초과했으면 제거
-        retry = entrance_trigger[trigger, cmd]
-        logger.info("send to wallpad: {} (life {})".format(resp.hex(), retry))
-        if not retry:
-            logger.error("    {} max retry count exceeded!".format(resp.hex()))
+        # retry time 관리, 초과했으면 제거
+        elapsed = time.time() - entrance_trigger[trigger, cmd]
+        if elapsed > Options["rs485"]["max_retry"]:
+            logger.error("send to wallpad: {} max retry time exceeded!".format(resp.hex()))
             entrance_pop(trigger, cmd)
+        elif elapsed > 3:
+            logger.warning("send to wallpad: {}, try another {:.01f} seconds...".format(resp.hex(), Options["rs485"]["max_retry"] - elapsed))
+            entrance_ack[triggers[trigger]["ack"]] = (trigger, cmd)
         else:
-            entrance_trigger[trigger, cmd] = retry - 1
+            logger.info("send to wallpad: {}".format(resp.hex()))
             entrance_ack[triggers[trigger]["ack"]] = (trigger, cmd)
 
     # full 모드일 때, 일상 응답
@@ -834,16 +836,17 @@ def serial_send_command():
     ack[0] = 0xB0
     ack = int.from_bytes(ack, "big")
 
-    # retry count 관리, 초과했으면 제거
-    retry = serial_queue[cmd]
-    logger.info("send to device:  {} (life {})".format(cmd.hex(), retry))
-    if not retry:
-        logger.error("    cmd {} max retry count exceeded!".format(cmd.hex()))
-
+    # retry time 관리, 초과했으면 제거
+    elapsed = time.time() - serial_queue[cmd] 
+    if elapsed > Options["rs485"]["max_retry"]:
+        logger.error("send to device:  {} max retry time exceeded!".format(cmd.hex()))
         serial_queue.pop(cmd)
         serial_ack.pop(ack, None)
+    elif elapsed > 3:
+        logger.warning("send to device:  {}, try another {:.01f} seconds...".format(cmd.hex(), Options["rs485"]["max_retry"] - elapsed))
+        serial_ack[ack] = cmd
     else:
-        serial_queue[cmd] = retry - 1
+        logger.info("send to device:  {}".format(cmd.hex()))
         serial_ack[ack] = cmd
 
 
@@ -979,7 +982,7 @@ def serial_loop():
 
         # 명령을 보낼 타이밍인지 확인: 0xXX5A 는 장치가 있는지 찾는 동작이므로,
         # 아직도 이러고 있다는건 아무도 응답을 안할걸로 예상, 그 타이밍에 끼어든다.
-        elif Options["serial_mode"] == "serial" and (header_1 == HEADER_1_SCAN or send_aggressive):
+        if Options["serial_mode"] == "serial" and (header_1 == HEADER_1_SCAN or send_aggressive):
             scan_count += 1
             if serial_queue:
                 serial_send_command()
@@ -1004,8 +1007,8 @@ def serial_loop():
                     logger.info("running stable...")
 
                 # 스캔이 없거나 적으면, 명령을 내릴 타이밍을 못잡는걸로 판단, 아무때나 닥치는대로 보내봐야한다.
-                if Options["serial_mode"] == "serial" and scan_count < 10:
-                    logger.warning("    send aggressive mode!", scan_count)
+                if Options["serial_mode"] == "serial" and scan_count < 30:
+                    logger.warning("initiate aggressive send mode!", scan_count)
                     send_aggressive = True
 
         # 루프 카운트 세는데 실패하면 다른 걸로 시도해봄
