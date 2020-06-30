@@ -2,6 +2,16 @@
 
 ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield]
 
+* [소개](#소개)
+    + [지원 장치](#지원-장치)
+* [설치](#설치)
+    + [1. 준비 사항](#1-준비-사항)
+    + [2. 애드온 설치, 실행](#2-애드온-설치-실행)
+    + [3. MQTT 통합 구성요소 설정](#3-mqtt-통합-구성요소-설정)
+    + [4. Lovelace 구성 예제](#4-lovelace-구성-예제)
+* [설정](#설정)
+* [지원](#지원)
+
 ## 소개
 
 * 삼성SDS 월패드를 사용하는 집에서, RS485를 이용해 여러 장치들을 제어할 수 있는 애드온입니다.
@@ -9,36 +19,50 @@
 
 ### 지원 장치
 
-* 기본 연결: 해당 장치가 이미 월패드와 연결되어 있는 경우에 가능합니다.
-  * 전등
-  * 난방
-  * 환기 (전열교환기)
-  * 대기전력차단, 콘센트별 실시간 전력사용량
-  * 가스밸브 (상태 확인)
-  * 실시간 에너지 사용량 (전기, 가스, 수도)
+#### 기본 연결
+* 해당 장치가 월패드와 연결되어 있는 경우에 가능합니다.
+* 지원 기능
+    * 전등
+    * 난방
+    * 환기 (전열교환기)
+    * 대기전력차단, 콘센트별 실시간 전력사용량
+    * 가스밸브 (상태 확인)
+    * 실시간 에너지 사용량 (전기, 가스, 수도)
 
-* 현관 스위치 대체 시 추가 연결
-  * **기존 현관 스위치의 RS485 연결을 분리하고, Configuration에서 entrance_mode를 "full" 로 변경하면 사용 가능합니다.**
-  * 엘리베이터 호출
-  * 가스밸브 잠금
+#### 현관 스위치 대체 시 추가 연결
+* 동작 조건
+    * **EW11 (소켓 통신) 사용 시 지원 불가**
+    * **기존 현관 스위치의 RS485 연결을 분리**
+    * Configuration에서 entrance_mode를 "full" 로 변경
+* 지원 기능
+    * 엘리베이터 호출
+    * 가스밸브 잠금
+        
+#### ~~인터폰 추가 시 추가 연결~~: 구현 진행 중
+* 동작 조건
+    * **EW11 (소켓 통신) 사용 시 지원 불가**
+    * Configuration에서 doorbell_mode를 "on" 으로 변경
+* 지원 기능
+    * 공동현관 출입문 열림 (수동, 1회 예약)
+    * ~~현관 출입문 열림~~: 오동작에 대한 우려로, 지원하지 않습니다.
 
 ## 설치
 
-### 1. 연결
+* 환경 구성에 지식이 있다면 애드온이 아닌 standalone으로도 사용하실 수 있도록 준비해 두었습니다.
+    * 이 경우 options\_example.json 을 options\_standalone.json 으로 복사해서 작성하신 뒤 run_standalone.sh 를 실행하시면 됩니다.
 
-* 엘리베이터 호출을 지원하려면 RS485 패킷을 한 Byte씩 즉시 확인할 수 있어야 하므로, EW11 등의 소켓 통신 사용 시 엘리베이터 호출 동작은 성공하지 못합니다.
+### 1. 준비 사항
 
-* 엘리베이터 호출 기능을 이용하려면, 먼저 현관에 달려있는 현관 스위치의 RS485 연결을 끊어야 합니다.
-  * 일괄소등/가스밸브 차단/엘리베이터 호출 중 한 가지 기능이라도 있는 스위치가 연결되어 있으면 안됩니다.
-  * 그러기 전에 "minimal" 모드를 시도해볼 수 있지만, 호출에 수십 초 이상 걸리거나 실패할 수 있습니다.
-
-* HA가 동작하는 장치에 USB to RS485로 직접 연결하기 어려우면, 별도의 Raspberry PI에 RS485를 연결하여 이 애드온을 실행할 수도 있습니다.
+* Mosquitto broker 설치
+    1. 홈어시스턴트의 Supervisor --> Add-on store에서 Mosquitto broker 선택합니다.
+    2. INSTALL 후 START 합니다.
+* MQTT Integration 설치
+    1. 홈어시스턴트의 설정 --> 통합 구성요소에서 우하단 추가( + ) 를 누른 후 MQTT를 검색하여 선택합니다.
+    2. "브로커" 에 HA의 IP주소 입력, "기기 검색 활성화" 후 확인을 누릅니다.
 
 ### 2. 애드온 설치, 실행
 
-#### 방법 1: HA Addon으로 설치, 실행
-
-1. 홈어시스턴트의 Supervisor (혹은 Hass.io) --> Add-on store에서 우상단 메뉴( ⋮ ) 를 누른 후 "repositories" 선택합니다.
+1. 홈어시스턴트의 Supervisor --> Add-on store에서 우상단 메뉴( ⋮ ) 를 누른 후 "repositories" 선택합니다.
 2. "Add repository" 영역에 "https://github.com/n-andflash/ha_addons/" 입력 후 ADD 를 누릅니다.
 3. 하단에 나타난 "Samsung SDS RS485 Addon with Elevator Call" 을 선택합니다.
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
@@ -46,23 +70,17 @@
 5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 아래 설정을 구성 후 "SAVE" 를 누릅니다.
     1. serial_mode (EW11 사용시 socket, 그 외의 경우 serial)
     2. serial/port 혹은 socket/address
-    3. mqtt/server, mqtt/need_login
+    3. mqtt/server: 위의 "브로커"와 같은 주소 입력
 6. "Info" 페이지로 돌아와서 "START" 로 시작합니다.
     1. 첫 시작 시 회전 애니메이션이 사라질 때까지 기다려주세요.
 7. "Log" 페이지에서 정상 동작하는지 확인합니다.
 
-#### 방법 2: 별도 장치에서 설치, 실행
-
-* 작성중
-* 일단은, options\_example.json 을 적절히 수정 후 run_standalone.sh 를 실행하면 됩니다.
-
 ### 3. MQTT 통합 구성요소 설정
 
-* 버전 2부터 MQTT discovery를 지원하므로, yaml 파일을 일일이 설정할 필요가 없습니다.
+* MQTT discovery를 지원하므로, yaml 파일을 장치마다 일일이 설정할 필요가 없습니다.
 * 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어있다면, HA에 sds_XXX 형식의 장치들이 자동으로 추가됩니다.
-* 작성중...
 
-### 4. Lovelace 구성
+### 4. Lovelace 구성 예제
 
 * 작성중...
 
