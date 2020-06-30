@@ -28,13 +28,13 @@
 			"port": 8899
 		},
 		"mqtt": {
-			"discovery": true,
-			"prefix": "sds",
 			"server": "127.0.0.1",
 			"port": 1883,
 			"need_login": false,
 			"user": "",
-			"passwd": ""
+			"passwd": "",
+			"discovery": true,
+			"prefix": "sds"
 		},
 		"rs485": {
 			"max_retry": 20,
@@ -63,13 +63,13 @@
 			"port": "int?"
 		},
 		"mqtt": {
-			"discovery": "bool",
-			"prefix": "str",
 			"server": "str",
 			"port": "int(0,65535)",
 			"need_login": "bool",
 			"user": "str?",
-			"passwd": "str?"
+			"passwd": "str?",
+			"discovery": "bool",
+			"prefix": "str"
 		},
 		"rs485": {
 			"max_retry": "int(0,100)",

@@ -103,17 +103,11 @@
 
 ### MQTT:
 
-#### discovery (true / false)
-* false로 변경하면 HA에 장치를 자동으로 등록하지 않습니다. 필요한 경우만 변경하세요.
-
-#### prefix (기본값: sds)
-* MQTT topic의 시작 단어를 변경합니다. 기본값으로 두시면 됩니다.
-
 #### `server`
 * MQTT broker (Mosquitto)의 IP를 적어주세요. 일반적으로 HA가 돌고있는 서버의 IP와 같습니다.
 
 #### port (기본값: 1883)
-* Mosquitto의 포트 번호를 변경하셨다면 변경한 포트 번호를 적어주세요. 
+* Mosquitto의 포트 번호를 변경하셨다면 변경한 포트 번호를 적어주세요.
 
 #### `need_login`
 * Mosquitto에 login이 필요하도록 설정하셨으면 (anonymous: false) true로 수정해 주세요.
@@ -121,13 +115,19 @@
 #### user, passwd
 * need_login이 true인 경우 Mosquitto의 아이디와 비밀번호를 적어주세요.
 
+#### discovery (true / false)
+* false로 변경하면 HA에 장치를 자동으로 등록하지 않습니다. 필요한 경우만 변경하세요.
+
+#### prefix (기본값: sds)
+* MQTT topic의 시작 단어를 변경합니다. 기본값으로 두시면 됩니다.
+
 ### rs485:
 #### max_retry (기본값: 20)
-* 실행한 명령에 대한 성공 응답을 받지 못했을 때, 몇번까지 재시도할지 설정합니다. 특히 "minimal" 모드인 경우 큰 값이 필요하지만, 3회 재시도에 2초 정도 걸리므로, 너무 크지 않은 값을 설정하세요.
+* 실행한 명령에 대한 성공 응답을 받지 못했을 때, 몇 초 동안 재시도할지 설정합니다. 특히 "minimal" 모드인 경우 큰 값이 필요하지만, 예상치 못한 타이밍에 동작하는 상황을 막으려면 적절한 값을 설정하세요.
 
 #### early\_response (기본값: 2)
 * 현관 스위치로써 월패드에게 응답하는 타이밍을 조절합니다. 0~2. 특히 "minimal" 모드의 성공률에 약간 영향이 있습니다 (큰 기대는 하지 마세요).
-  
+
 #### dump\_time (기본값: 0)
 * 0보다 큰 값을 설정하면, 애드온이 시작하기 전에 입력한 시간(초) 동안 log로 RS485 패킷 덤프를 출력합니다.
 * SerialPortMon으로 RS485를 관찰하는 것과 같은 기능입니다.
@@ -143,11 +143,22 @@
 
 ## 지원
 
+* 정확한 지원을 위해서, 글을 쓰실 때 아래 사항들을 포함해 주세요.
+    * 실행 로그 (HA의 share 폴더에 최신 로그 파일 (날짜가 써있지 않은 sds_wallpad.log 파일) 이 있습니다)
+    * Configuration 페이지 내용 (MQTT broker password가 있으면 가려주세요)
+* 집마다 패킷이나 장치 구성이 다르므로, 해결을 위해 여러 번의 추가정보 확인 요청이 필요할 수 있습니다.
+
 [HomeAssistant 네이버 카페 (질문, 수정 제안 등)](https://cafe.naver.com/koreassistant)
 
 [Github issue 페이지 (버그 신고, 수정 제안 등)](https://github.com/n-andflash/ha_addons/issues)
 
 [삼성SDS 월패드 RS485 패킷 분석](DOCS_PACKETS.md)
+
+## 면책조항 (Disclaimer)
+
+* 이 애드온은 무상으로 제공되므로 정확성이나 안정성 등 어떠한 보증도 제공하지 않습니다.
+* 이 애드온은 오픈소스로 실행 코드와 함께 배포되므로 코드 및 동작에 대한 확인 책임은 사용자에게 있습니다.
+* 기타 사항은 GPLv3를 따릅니다. [전문보기](LICENSE)
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
