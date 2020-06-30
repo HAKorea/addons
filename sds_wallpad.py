@@ -1023,10 +1023,14 @@ def dump_loop():
         start_time = time.time()
         logger.warning("packet dump for {} seconds!".format(dump_time))
 
-        set_timeout(1)
+        set_timeout(2)
         logs = []
         while time.time() - start_time < dump_time:
-            data = recv(1024)
+            try:
+                data = recv(1024)
+            except:
+                continue
+
             for b in data:
                 if b == 0xA1 or len(logs) > 500:
                     logger.info("".join(logs))
