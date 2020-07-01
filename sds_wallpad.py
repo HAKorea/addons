@@ -944,6 +944,11 @@ def serial_loop():
             if not serial_verify_checksum(packet):
                 continue
 
+            # 디바이스 응답 뒤에도 명령 보내봄
+            if Options["serial_mode"] == "serial" and not send_aggressive:
+                if serial_queue:
+                    serial_send_command()
+
             # 적절히 처리한다
             serial_receive_state(device, packet)
 
