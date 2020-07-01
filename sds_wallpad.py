@@ -25,10 +25,10 @@ ENTRANCE_SWITCH = {
         "pinit":  { "header": 0xA45A, "resp": 0xB05A006A, }, # 처음 전기가 들어왔거나 한동안 응답을 안했을 때, 이것부터 해야 함
         "pquery": { "header": 0xA441, "resp": 0xB0410071, },
         "pding":  { "header": 0xA432, "resp": 0xB0320002, }, # 초인종 눌림, ack
-                                                             # 통화 시작은 0xA441에 응답해야함
-        "pcall":  { "header": 0xA436, "resp": 0xB0420072, }, # 통화 시작 ack의 ack
-                                                             # 문열림은 0xA441에 응답해야함
-        "popen":  { "header": 0xA43B, "resp": 0xB0420072, }, # 문열림 ack의 ack
+        #"pcall": { "header": 0xA441, "resp": 0xB0360204, }, # 통화 시작, 0xA441 응답은 동적으로 전환
+        "pcalla": { "header": 0xA436, "resp": 0xB0420072, }, # 통화 시작 ack의 ack
+        #"popen": { "header": 0xA441, "resp": 0xB03B010A, }, # 문열림, 0xA441 응답은 동적으로 전환
+        "popena": { "header": 0xA43B, "resp": 0xB0420072, }, # 문열림 ack의 ack
         "pend":   { "header": 0xA43E, "resp": 0xB03E0608, }, # 상황 종료
     },
 
@@ -349,7 +349,7 @@ def init_entrance():
 
         # 공동현관 문열림 테스트 관련 항목 제거
         if Options["doorbell_mode"] != "on":
-            for t in ["pinit", "pquery", "pding", "pcall", "popen", "pend"]:
+            for t in ["pinit", "pquery", "pding", "pcalla", "popena", "pend"]:
                 entrance_watch.pop(ENTRANCE_SWITCH["default"][t]["header"])
 
     elif Options["entrance_mode"] == "minimal":
@@ -575,9 +575,9 @@ def entrance_query(header):
         # 공동현관 문열림 관련 (테스트중)
         if Options["doorbell_mode"] == "on":
             if header == 0xA432: # 초인종 눌림
-                entrance_watch[0xA441] = 0xB0360600 # 다음번에 통화 시작
+                entrance_watch[0xA441] = 0xB0360204 # 다음번에 통화 시작
             elif header == 0xA436: # 통화 시작 성공
-                entrance_watch[0xA441] = 0xB03B000B # 다음번에 문열림
+                entrance_watch[0xA441] = 0xB03B010A # 다음번에 문열림
             elif header == 0xA43B: # 문열림 성공
                 entrance_watch[0xA441] = 0xB0410071 # 일상으로 복귀
 
