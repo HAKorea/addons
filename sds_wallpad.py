@@ -272,6 +272,10 @@ entrance_ack = {}
 serial_queue = {}
 serial_ack = {}
 
+pending_recv = 0
+soc_in_waiting = 0
+soc_recv_buf = bytearray()
+
 last_query = int(0).to_bytes(2, "big")
 last_topic_list = {}
 
@@ -355,6 +359,32 @@ def init_entrance():
     elif Options["entrance_mode"] == "minimal":
         # minimal 모드에서 일괄소등은 월패드 애드온에서만 제어 가능
         ENTRANCE_SWITCH["trigger"].pop("light")
+
+
+def recv(count=1):
+    global pending_recv
+    global soc_in_waiting
+
+    # serial이면 pending count만 업데이트
+    if Options["serial_mode"] == "serial":
+        pending_recv = max(pending_recv - count, 0)
+        return recv_raw(count)
+
+    # socket이면 버퍼와 in_waiting 직접 관리
+    else:
+        if len(soc_recv_buf) < count:
+            new_data = recv_raw(1024)
+            soc_in_waiting += len(new_data)
+            soc_recv_buf.extend(new_data)
+        if len(soc_recv_buf) < count:
+            return None
+
+        soc_in_waiting -= count
+        pending_recv = max(pending_recv - count, 0)
+
+        res = soc_recv_buf[0:count]
+        del soc_recv_buf[0:count]
+        return res
 
 
 def mqtt_add_entrance():
@@ -543,6 +573,10 @@ def entrance_query(header):
     query = ENTRANCE_SWITCH["default"]["query"]
     triggers = ENTRANCE_SWITCH["trigger"]
 
+    # pending이 남은 상태면 지금 시도해봐야 가망이 없음
+    if pending_recv:
+        return
+
     # 아직 2Byte 덜 받았으므로 올때까지 기다리는게 정석 같지만,
     # 조금 일찍 시작하는게 성공률이 더 높은거 같기도 하다.
     length = 2 - Options["rs485"]["early_response"]
@@ -575,11 +609,11 @@ def entrance_query(header):
         # 공동현관 문열림 관련 (테스트중)
         if Options["doorbell_mode"] == "on":
             if header == 0xA432: # 초인종 눌림
-                entrance_watch[0xA441] = 0xB0360204 # 다음번에 통화 시작
+                entrance_watch[0xA441] = int(0xB0360204).to_bytes(4, "big") # 다음번에 통화 시작
             elif header == 0xA436: # 통화 시작 성공
-                entrance_watch[0xA441] = 0xB03B010A # 다음번에 문열림
+                entrance_watch[0xA441] = int(0xB03B010A).to_bytes(4, "big") # 다음번에 문열림
             elif header == 0xA43B: # 문열림 성공
-                entrance_watch[0xA441] = 0xB0410071 # 일상으로 복귀
+                entrance_watch[0xA441] = int(0xB0410071).to_bytes(4, "big") # 일상으로 복귀
 
 
 def entrance_clear(header):
@@ -837,7 +871,7 @@ def serial_send_command():
     ack = int.from_bytes(ack, "big")
 
     # retry time 관리, 초과했으면 제거
-    elapsed = time.time() - serial_queue[cmd] 
+    elapsed = time.time() - serial_queue[cmd]
     if elapsed > Options["rs485"]["max_retry"]:
         logger.error("send to device:  {} max retry time exceeded!".format(cmd.hex()))
         serial_queue.pop(cmd)
@@ -854,6 +888,10 @@ def socket_set_timeout(a):
     soc.settimeout(a)
 
 
+def socket_in_waiting():
+    return soc_in_waiting
+
+
 def init_socket():
     addr = Options["socket"]["address"]
     port = Options["socket"]["port"]
@@ -862,12 +900,14 @@ def init_socket():
     soc = socket.socket()
     soc.connect((addr, port))
 
-    global recv
+    global recv_raw
     global send
     global set_timeout
-    recv = soc.recv
+    global in_waiting
+    recv_raw = soc.recv
     send = soc.sendall
     set_timeout = socket_set_timeout
+    in_waiting = socket_in_waiting
 
     # 소켓에 뭐가 떠다니는지 확인
     soc.settimeout(5.0)
@@ -881,6 +921,10 @@ def serial_set_timeout(a):
     ser.timeout = a
 
 
+def serial_in_waiting():
+    return ser.in_waiting
+
+
 def init_serial():
     global ser
     ser.port = Options["serial"]["port"]
@@ -892,12 +936,14 @@ def init_serial():
     ser.close()
     ser.open()
 
-    global recv
+    global recv_raw
     global send
     global set_timeout
-    recv = ser.read
+    global in_waiting
+    recv_raw = ser.read
     send = ser.write
     set_timeout = serial_set_timeout
+    in_waiting = serial_in_waiting
 
     # 시리얼에 뭐가 떠다니는지 확인
     ser.timeout = 5
@@ -909,6 +955,8 @@ def init_serial():
 
 
 def serial_loop():
+    global pending_recv
+
     logger.info("start loop ...")
     loop_count = 0
     scan_count = 0
@@ -945,9 +993,9 @@ def serial_loop():
                 continue
 
             # 디바이스 응답 뒤에도 명령 보내봄
-            if Options["serial_mode"] == "serial" and not send_aggressive:
-                if serial_queue:
-                    serial_send_command()
+            if serial_queue and not pending_recv:
+                serial_send_command()
+                pending_recv = in_waiting()
 
             # 적절히 처리한다
             serial_receive_state(device, packet)
@@ -987,20 +1035,16 @@ def serial_loop():
 
         # 명령을 보낼 타이밍인지 확인: 0xXX5A 는 장치가 있는지 찾는 동작이므로,
         # 아직도 이러고 있다는건 아무도 응답을 안할걸로 예상, 그 타이밍에 끼어든다.
-        if Options["serial_mode"] == "serial" and (header_1 == HEADER_1_SCAN or send_aggressive):
+        if header_1 == HEADER_1_SCAN or send_aggressive:
             scan_count += 1
-            if serial_queue:
+            if serial_queue and not pending_recv:
                 serial_send_command()
+                pending_recv = in_waiting()
 
         # 전체 루프 수 카운트
         global HEADER_0_FIRST
         if header_0 == HEADER_0_FIRST:
             loop_count += 1
-
-            # socket은 bulk로 처리되다보니 타이밍 잡는게 의미가 없다. 그냥 한바퀴에 하나씩 보내봄
-            if Options["serial_mode"] == "socket":
-                if serial_queue:
-                    serial_send_command()
 
             # 돌만큼 돌았으면 상황 판단
             if loop_count == 30:
