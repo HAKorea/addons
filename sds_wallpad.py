@@ -272,19 +272,110 @@ entrance_ack = {}
 serial_queue = {}
 serial_ack = {}
 
-pending_recv = 0
-soc_in_waiting = 0
-soc_recv_buf = bytearray()
-
 last_query = int(0).to_bytes(2, "big")
 last_topic_list = {}
 
-ser = serial.Serial()
 mqtt = paho_mqtt.Client()
 mqtt_connected = False
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%H:%M:%S")
+
+
+class SDSSerial:
+    def __init__(self):
+        self._ser = serial.Serial()
+        self._ser.port = Options["serial"]["port"]
+        self._ser.baudrate = Options["serial"]["baudrate"]
+        self._ser.bytesize = Options["serial"]["bytesize"]
+        self._ser.parity = Options["serial"]["parity"]
+        self._ser.stopbits = Options["serial"]["stopbits"]
+
+        self._ser.close()
+        self._ser.open()
+
+        self._pending_recv = 0
+
+        # 시리얼에 뭐가 떠다니는지 확인
+        self.set_timeout(5.0)
+        data = self._recv_raw(1)
+        self.set_timeout(None)
+        if not data:
+            logger.critical("no active packet at this serial port!")
+
+    def _recv_raw(self, count=1):
+        return self._ser.read(count)
+
+    def recv(self, count=1):
+        # serial은 pending count만 업데이트
+        self._pending_recv = max(self._pending_recv - count, 0)
+        return self._recv_raw(count)
+
+    def send(self, a):
+        self._ser.write(a)
+
+    def set_pending_recv(self):
+        self._pending_recv = self._ser.in_waiting
+
+    def check_pending_recv(self):
+        return self._pending_recv
+
+    def check_in_waiting(self):
+        return self._ser.in_waiting
+
+    def set_timeout(self, a):
+        self._ser.timeout = a
+
+
+class SDSSocket:
+    def __init__(self):
+        addr = Options["socket"]["address"]
+        port = Options["socket"]["port"]
+
+        self._soc = socket.socket()
+        self._soc.connect((addr, port))
+
+        self._recv_buf = bytearray()
+        self._pending_recv = 0
+
+        # 소켓에 뭐가 떠다니는지 확인
+        self.set_timeout(5.0)
+        data = self._recv_raw(1)
+        self.set_timeout(None)
+        if not data:
+            logger.critical("no active packet at this socket!")
+
+    def _recv_raw(self, count=1):
+        return self._soc.recv(count)
+
+    def recv(self, count=1):
+        # socket은 버퍼와 in_waiting 직접 관리
+        if len(self._recv_buf) < count:
+            new_data = self._recv_raw(1024)
+            self._recv_buf.extend(new_data)
+        if len(self._recv_buf) < count:
+            return None
+
+        self._pending_recv = max(self._pending_recv - count, 0)
+
+        res = self._recv_buf[0:count]
+        del self._recv_buf[0:count]
+        return res
+
+    def send(self, a):
+        self._soc.sendall(a)
+
+    def set_pending_recv(self):
+        self._pending_recv = len(self._recv_buf)
+
+    def check_pending_recv(self):
+        return self._pending_recv
+
+    def check_in_waiting(self):
+        return len(self._recv_buf)
+
+    def set_timeout(self, a):
+        self._soc.settimeout(a)
 
 
 def init_logger():
@@ -359,32 +450,6 @@ def init_entrance():
     elif Options["entrance_mode"] == "minimal":
         # minimal 모드에서 일괄소등은 월패드 애드온에서만 제어 가능
         ENTRANCE_SWITCH["trigger"].pop("light")
-
-
-def recv(count=1):
-    global pending_recv
-    global soc_in_waiting
-
-    # serial이면 pending count만 업데이트
-    if Options["serial_mode"] == "serial":
-        pending_recv = max(pending_recv - count, 0)
-        return recv_raw(count)
-
-    # socket이면 버퍼와 in_waiting 직접 관리
-    else:
-        if len(soc_recv_buf) < count:
-            new_data = recv_raw(1024)
-            soc_in_waiting += len(new_data)
-            soc_recv_buf.extend(new_data)
-        if len(soc_recv_buf) < count:
-            return None
-
-        soc_in_waiting -= count
-        pending_recv = max(pending_recv - count, 0)
-
-        res = soc_recv_buf[0:count]
-        del soc_recv_buf[0:count]
-        return res
 
 
 def mqtt_add_entrance():
@@ -574,20 +639,20 @@ def entrance_query(header):
     triggers = ENTRANCE_SWITCH["trigger"]
 
     # pending이 남은 상태면 지금 시도해봐야 가망이 없음
-    if pending_recv:
+    if conn.check_pending_recv():
         return
 
     # 아직 2Byte 덜 받았으므로 올때까지 기다리는게 정석 같지만,
     # 조금 일찍 시작하는게 성공률이 더 높은거 같기도 하다.
     length = 2 - Options["rs485"]["early_response"]
     if length > 0:
-        while ser.in_waiting < length: pass
+        while conn.check_in_waiting() < length: pass
 
     if entrance_trigger and header == query["header"]:
         # 하나 뽑아서 보내봄
         trigger, cmd = next(iter(entrance_trigger))
         resp = triggers[trigger][cmd].to_bytes(4, "big")
-        send(resp)
+        conn.send(resp)
 
         # retry time 관리, 초과했으면 제거
         elapsed = time.time() - entrance_trigger[trigger, cmd]
@@ -604,7 +669,7 @@ def entrance_query(header):
     # full 모드일 때, 일상 응답
     else:
         resp = entrance_watch[header]
-        send(resp)
+        conn.send(resp)
 
         # 공동현관 문열림 관련 (테스트중)
         if Options["doorbell_mode"] == "on":
@@ -626,7 +691,7 @@ def entrance_clear(header):
     entrance_ack.pop(header, None)
 
     # 뒷부분 꺼내서 버림
-    recv(2)
+    conn.recv(2)
 
 
 def serial_verify_checksum(packet):
@@ -836,12 +901,12 @@ def serial_get_header():
     try:
         # 0x80보다 큰 byte가 나올 때까지 대기
         while 1:
-            header_0 = recv(1)[0]
+            header_0 = conn.recv(1)[0]
             if header_0 >= 0x80: break
 
         # 중간에 corrupt되는 data가 있으므로 연속으로 0x80보다 큰 byte가 나오면 먼젓번은 무시한다
         while 1:
-            header_1 = recv(1)[0]
+            header_1 = conn.recv(1)[0]
             if header_1 < 0x80: break
             header_0 = header_1
 
@@ -864,7 +929,7 @@ def serial_ack_command(packet):
 def serial_send_command():
     # 한번에 여러개 보내면 응답이랑 꼬여서 망함
     cmd = next(iter(serial_queue))
-    send(cmd)
+    conn.send(cmd)
 
     ack = bytearray(cmd[0:3])
     ack[0] = 0xB0
@@ -884,79 +949,7 @@ def serial_send_command():
         serial_ack[ack] = cmd
 
 
-def socket_set_timeout(a):
-    soc.settimeout(a)
-
-
-def socket_in_waiting():
-    return soc_in_waiting
-
-
-def init_socket():
-    addr = Options["socket"]["address"]
-    port = Options["socket"]["port"]
-
-    global soc
-    soc = socket.socket()
-    soc.connect((addr, port))
-
-    global recv_raw
-    global send
-    global set_timeout
-    global in_waiting
-    recv_raw = soc.recv
-    send = soc.sendall
-    set_timeout = socket_set_timeout
-    in_waiting = socket_in_waiting
-
-    # 소켓에 뭐가 떠다니는지 확인
-    soc.settimeout(5.0)
-    data = recv(1)
-    soc.settimeout(None)
-    if not data:
-        logger.critical("no active packet at this socket!")
-
-
-def serial_set_timeout(a):
-    ser.timeout = a
-
-
-def serial_in_waiting():
-    return ser.in_waiting
-
-
-def init_serial():
-    global ser
-    ser.port = Options["serial"]["port"]
-    ser.baudrate = Options["serial"]["baudrate"]
-    ser.bytesize = Options["serial"]["bytesize"]
-    ser.parity = Options["serial"]["parity"]
-    ser.stopbits = Options["serial"]["stopbits"]
-
-    ser.close()
-    ser.open()
-
-    global recv_raw
-    global send
-    global set_timeout
-    global in_waiting
-    recv_raw = ser.read
-    send = ser.write
-    set_timeout = serial_set_timeout
-    in_waiting = serial_in_waiting
-
-    # 시리얼에 뭐가 떠다니는지 확인
-    ser.timeout = 5
-    data = recv(1)
-    ser.timeout = None
-
-    if not data:
-        logger.critical("no active packet at this serial port!")
-
-
 def serial_loop():
-    global pending_recv
-
     logger.info("start loop ...")
     loop_count = 0
     scan_count = 0
@@ -986,16 +979,16 @@ def serial_loop():
             device, remain = STATE_HEADER[header]
 
             # 해당 길이만큼 읽음
-            packet += recv(remain)
+            packet += conn.recv(remain)
 
             # checksum 오류 없는지 확인
             if not serial_verify_checksum(packet):
                 continue
 
             # 디바이스 응답 뒤에도 명령 보내봄
-            if serial_queue and not pending_recv:
+            if serial_queue and not conn.check_pending_recv():
                 serial_send_command()
-                pending_recv = in_waiting()
+                conn.set_pending_recv()
 
             # 적절히 처리한다
             serial_receive_state(device, packet)
@@ -1008,7 +1001,7 @@ def serial_loop():
             device, remain = EVENT_HEADER[header_0]
 
             # 해당 길이만큼 읽음
-            packet += recv(remain)
+            packet += conn.recv(remain)
 
             # checksum 오류 없는지 확인
             if not serial_verify_checksum(packet):
@@ -1019,7 +1012,7 @@ def serial_loop():
 
         elif header_0 == HEADER_0_STATE:
             # 한 byte 더 뽑아서, 보냈던 명령의 ack인지 확인
-            header_2 = recv(1)[0]
+            header_2 = conn.recv(1)[0]
             header = (header << 8) | header_2
 
             if header in serial_ack:
@@ -1029,7 +1022,7 @@ def serial_loop():
         elif header in QUERY_HEADER:
             # 나머지 더 뽑아서 저장
             global last_query
-            packet = recv(QUERY_HEADER[header][1])
+            packet = conn.recv(QUERY_HEADER[header][1])
             packet = header.to_bytes(2, "big") + packet
             last_query = packet
 
@@ -1037,9 +1030,9 @@ def serial_loop():
         # 아직도 이러고 있다는건 아무도 응답을 안할걸로 예상, 그 타이밍에 끼어든다.
         if header_1 == HEADER_1_SCAN or send_aggressive:
             scan_count += 1
-            if serial_queue and not pending_recv:
+            if serial_queue and not conn.check_pending_recv():
                 serial_send_command()
-                pending_recv = in_waiting()
+                conn.set_pending_recv()
 
         # 전체 루프 수 카운트
         global HEADER_0_FIRST
@@ -1079,7 +1072,7 @@ def dump_loop():
         logs = []
         while time.time() - start_time < dump_time:
             try:
-                data = recv(1024)
+                data = conn.recv(1024)
             except:
                 continue
 
@@ -1097,6 +1090,8 @@ def dump_loop():
 
 
 if __name__ == "__main__":
+    global conn
+
     # configuration 로드 및 로거 설정
     init_logger()
     init_option(sys.argv)
@@ -1107,10 +1102,10 @@ if __name__ == "__main__":
 
     if Options["serial_mode"] == "socket":
         logger.info("initialize socket...")
-        init_socket()
+        conn = SDSSocket()
     else:
         logger.info("initialize serial...")
-        init_serial()
+        conn = SDSSerial()
 
     dump_loop()
 
