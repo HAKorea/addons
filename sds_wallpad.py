@@ -501,7 +501,6 @@ def mqtt_debug(topics, payload):
         if (command == "send"):
             # parity는 여기서 재생성
             packet = bytearray.fromhex(payload)
-            packet[-1] = 0
             packet[-1] = serial_generate_checksum(packet)
             packet = bytes(packet)
 
@@ -699,9 +698,9 @@ def serial_verify_checksum(packet):
 
 
 def serial_generate_checksum(packet):
-    # 모든 byte를 XOR
+    # 마지막 제외하고 모든 byte를 XOR
     checksum = 0
-    for b in packet:
+    for b in packet[:-1]:
         checksum ^= b
 
     # parity의 최상위 bit는 항상 0
