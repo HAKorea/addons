@@ -120,6 +120,14 @@ RS485_EVENT = {
     },
 }
 
+DISCOVERY_DEVICE = {
+    "ids": ["sds_wallpad",],
+    "name": "sds_wallpad",
+    "mf": "Samsung SDS",
+    "mdl": "Samsung SDS Wallpad",
+    "sw": "n-andflash/ha_addons/sds_wallpad",
+}
+
 DISCOVERY_ENTRANCE = [
     {
         "~": "{}/entrance/ev",
@@ -452,6 +460,17 @@ def init_entrance():
         ENTRANCE_SWITCH["trigger"].pop("light")
 
 
+def mqtt_discovery(intg, payload):
+    # MQTT 통합구성요소에 등록되기 위한 추가 내용
+    payload["device"] = DISCOVERY_DEVICE
+    payload["uniq_id"] = payload["name"]
+
+    # discovery에 등록
+    topic = "homeassistant/{}/sds_wallpad/{}/config".format(intg, payload["name"])
+    logger.info("Add new device:  {}".format(topic))
+    mqtt.publish(topic, json.dumps(payload), retain=True)
+
+
 def mqtt_add_entrance():
     if Options["entrance_mode"] == "off": return
 
@@ -461,10 +480,7 @@ def mqtt_add_entrance():
         payload["~"] = payload["~"].format(prefix)
         payload["name"] = payload["name"].format(prefix)
 
-        # discovery에 등록
-        topic = "homeassistant/switch/{}/config".format(payload["name"])
-        logger.info("Add new device:  {}".format(topic))
-        mqtt.publish(topic, json.dumps(payload), retain=True)
+        mqtt_discovery("switch", payload)
 
 
 def mqtt_entrance(topics, payload):
@@ -775,11 +791,7 @@ def serial_new_device(device, idn, packet):
             payload["stat_t"] = payload["stat_t"].format(idn=idn, bit=bit+1)
             payload["cmd_t"] = payload["cmd_t"].format(id2=id2+bit)
 
-            # discovery에 등록
-            topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
-            payload.pop("_type")
-            logger.info("Add new device:  {} ({}: {})".format(topic, last_query.hex(), packet.hex()))
-            mqtt.publish(topic, json.dumps(payload), retain=True)
+            mqtt_discovery(payload.pop("_type"), payload)
 
     elif device in DISCOVERY_PAYLOAD:
         for payloads in DISCOVERY_PAYLOAD[device]:
@@ -792,11 +804,7 @@ def serial_new_device(device, idn, packet):
                 payload["name"] = "{}_{}_consumption".format(prefix, ("power", "gas", "water")[idn])
                 payload["unit_of_meas"] = ("Wh", "m³", "m³")[idn]
 
-            # discovery에 등록
-            topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
-            payload.pop("_type")
-            logger.info("Add new device:  {}".format(topic))
-            mqtt.publish(topic, json.dumps(payload), retain=True)
+            mqtt_discovery(payload.pop("_type"), payload)
 
 
 def serial_new_event(device, packet):
@@ -808,11 +816,7 @@ def serial_new_event(device, packet):
         payload["~"] = payload["~"].format(prefix=prefix, idn=idn)
         payload["name"] = payload["name"].format(prefix=prefix, idn=idn)
 
-        # discovery에 등록
-        topic = "homeassistant/{}/{}/config".format(payload["_type"], payload["name"])
-        payload.pop("_type")
-        logger.info("Add new device:  {}".format(topic))
-        mqtt.publish(topic, json.dumps(payload), retain=True)
+        mqtt_discovery(payload.pop("_type"), payload)
 
 
 def serial_receive_state(device, packet):
