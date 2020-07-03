@@ -109,17 +109,6 @@ RS485_DEVICE = {
     },
 }
 
-RS485_EVENT = {
-    "phone1": {
-        "header": 0xA5, "length": 4, "normal": 0x41, "last": {},
-        "text": { 0x41: "대기중", 0x3E: "대기중", 0x31: "현관", 0x32: "공동현관", }
-    },
-    "phone2": {
-        "header": 0xA6, "length": 4, "normal": 0x41, "last": {},
-        "text": { 0x41: "대기중", 0x3E: "대기중", 0x31: "현관", 0x32: "공동현관", }
-    },
-}
-
 DISCOVERY_DEVICE = {
     "ids": ["sds_wallpad",],
     "name": "sds_wallpad",
@@ -233,21 +222,6 @@ DISCOVERY_PAYLOAD = {
     } ],
 }
 
-DISCOVERY_EVENT = {
-    "phone1": {
-        "_type": "sensor",
-        "~": "{prefix}/phone1/{idn}",
-        "name": "{prefix}_phone1",
-        "stat_t": "~/event/state",
-    },
-    "phone2": {
-        "_type": "sensor",
-        "~": "{prefix}/phone2/{idn}",
-        "name": "{prefix}_phone2",
-        "stat_t": "~/event/state",
-    },
-}
-
 STATE_HEADER = {
     prop["state"]["header"]: (device, prop["state"]["length"] - 2)
     for device, prop in RS485_DEVICE.items()
@@ -257,10 +231,6 @@ QUERY_HEADER = {
     prop["query"]["header"]: (device, prop["query"]["length"] - 2)
     for device, prop in RS485_DEVICE.items()
     if "query" in prop
-}
-EVENT_HEADER = {
-    prop["header"]: (event, prop["length"] - 2)
-    for event, prop in RS485_EVENT.items()
 }
 
 HEADER_0_STATE = 0xB0
@@ -807,18 +777,6 @@ def serial_new_device(device, idn, packet):
             mqtt_discovery(payload.pop("_type"), payload)
 
 
-def serial_new_event(device, packet):
-    prefix = Options["mqtt"]["prefix"]
-    idn = 1
-
-    if device in DISCOVERY_EVENT:
-        payload = DISCOVERY_EVENT[device]
-        payload["~"] = payload["~"].format(prefix=prefix, idn=idn)
-        payload["name"] = payload["name"].format(prefix=prefix, idn=idn)
-
-        mqtt_discovery(payload.pop("_type"), payload)
-
-
 def serial_receive_state(device, packet):
     form = RS485_DEVICE[device]["state"]
     last = RS485_DEVICE[device]["last"]
@@ -862,44 +820,6 @@ def serial_receive_state(device, packet):
         mqtt.publish(topic, value, retain=True)
         last_topic_list[topic] = value
 
-
-def serial_receive_event(device, packet):
-    last = RS485_EVENT[device]["last"]
-    text = RS485_EVENT[device]["text"]
-    normal = RS485_EVENT[device]["normal"]
-    idn = 1
-
-    # 이전 상태와 같은 경우 바로 무시
-    if last == packet:
-        return
-
-    # 처음 받은 상태인 경우, discovery 용도로 등록한다.
-    if Options["mqtt"]["discovery"] and not last.get(idn):
-        serial_new_event(device, packet)
-
-        # 장치 등록 먼저 하고, 상태 등록은 그 다음 턴에 한다. (상태 등록 무시되는 현상 방지)
-        last[idn] = True
-        return
-
-    # 이벤트 형식이므로, 평소 패킷이면 최초를 제외하고는 무시
-    elif last[idn] != True and packet[1] == normal:
-        last[idn] = packet
-        return
-
-    last[idn] = packet
-
-    # payload 결정
-    if packet[1] in text:
-        payload = text[packet[1]]
-    else:
-        payload = hex(packet[1])
-
-    # MQTT topic 형태로 변환, publish
-    prefix = Options["mqtt"]["prefix"]
-    topic = "{}/{}/1/event/state".format(prefix, device)
-
-    logger.info("publish to HA:   {} = {} ({})".format(topic, payload, packet.hex()))
-    mqtt.publish(topic, payload)
 
 def serial_get_header():
     try:
@@ -996,23 +916,6 @@ def serial_loop():
 
             # 적절히 처리한다
             serial_receive_state(device, packet)
-
-        # 초인종 -> 부엌,화장실 인터폰 패킷 캡처
-        elif header_0 in EVENT_HEADER:
-            packet = bytes([header_0, header_1])
-
-            # 몇 Byte짜리 패킷인지 확인
-            device, remain = EVENT_HEADER[header_0]
-
-            # 해당 길이만큼 읽음
-            packet += conn.recv(remain)
-
-            # checksum 오류 없는지 확인
-            if not serial_verify_checksum(packet):
-                continue
-
-            # 적절히 처리한다
-            serial_receive_event(device, packet)
 
         elif header_0 == HEADER_0_STATE:
             # 한 byte 더 뽑아서, 보냈던 명령의 ack인지 확인
