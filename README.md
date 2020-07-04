@@ -79,11 +79,14 @@
 ### 3. MQTT 통합 구성요소 설정
 
 * MQTT discovery를 지원하므로, yaml 파일을 장치마다 일일이 설정할 필요가 없습니다.
-* 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어있다면, HA에 sds_XXX 형식의 장치들이 자동으로 추가됩니다.
+* 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어 있어야 합니다.
+* MQTT 통합 구성요소에 "sds_wallpad" 기기가 생성되고 모든 엔티티가 등록됩니다.
+![엔티티 목록][images/entity_list.png]
 
 ### 4. Lovelace 구성 예제
 
-* 작성중...
+![Lovelace 구성 예제][images/lovelace_example.png]
+* [설정 방법 보러가기](DOCS_LOVELACE.md)
 
 ## 설정
 
