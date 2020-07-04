@@ -155,6 +155,10 @@
 * SerialPortMon으로 RS485를 관찰하는 것과 같은 기능입니다.
 * 버그/수정 제보 등 패킷 덤프가 필요할 때만 사용하세요.
 
+#### intercom\_header (기본값: A45A)
+* 평상시 RS485 덤프에서 A15A, A25A, A35A, A45A, A55A, A65A 중 한 가지가 보여야 intercom\_mode 를 사용할 수 있습니다.
+* 보이는 패킷을 입력해 주세요.
+
 ### log:
 #### to\_file (true / false)
 * false로 설정하면 로그를 파일로 남기지 않습니다.

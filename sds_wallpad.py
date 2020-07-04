@@ -452,6 +452,8 @@ def init_virtual_device():
         RS485_DEVICE.pop("cutoff")
 
     if Options["intercom_mode"] == "on":
+        VIRTUAL_DEVICE["intercom"]["header0"] = int(Options["rs485"]["intercom_header"][:2], 16)
+
         header_0_virtual[VIRTUAL_DEVICE["intercom"]["header0"]] = "intercom"
         virtual_trigger["intercom"] = {}
 
@@ -513,10 +515,10 @@ def mqtt_add_virtual():
         # 초인종 울리기 전까지 문열림 스위치 offline으로 설정
         payload = "offline"
         topic = "{}/virtual/intercom/public/available".format(prefix)
-        logger.info("doorlock status: {} = {}".format(topic, payload))
+        logger.info("doorlock state:  {} = {}".format(topic, payload))
         mqtt.publish(topic, payload, retain=True)
         topic = "{}/virtual/intercom/private/available".format(prefix)
-        logger.info("doorlock status: {} = {}".format(topic, payload))
+        logger.info("doorlock state:  {} = {}".format(topic, payload))
         mqtt.publish(topic, payload, retain=True)
 
 
