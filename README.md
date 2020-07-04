@@ -34,23 +34,23 @@
 * 동작 조건
     * **EW11 (소켓 통신) 사용 시 지원 불가**
     * **기존 현관 스위치의 RS485 연결을 분리 필요**
-    * Configuration에서 entrance_mode를 "full" 로 변경
+    * Configuration에서 entrance\_mode를 "full" 로 변경
 * 지원 기능
     * 엘리베이터 호출
     * 가스밸브 잠금
 
-#### ~~인터폰 추가 시 추가 연결~~: 구현 진행 중
+#### 인터폰 추가 시 추가 연결
 * 동작 조건
     * **EW11 (소켓 통신) 사용 시 지원 불가**
-    * Configuration에서 doorbell_mode를 "on" 으로 변경
+    * Configuration에서 intercom\_mode를 "on" 으로 변경
 * 지원 기능
-    * 공동현관 출입문 열림 (수동, 1회 예약)
+    * 공동현관 출입문 열림
     * ~~현관 출입문 열림~~: 오동작에 대한 우려로, 지원하지 않습니다.
 
 ## 설치
 
 * 환경 구성에 지식이 있다면 애드온이 아닌 standalone으로도 사용하실 수 있도록 준비해 두었습니다.
-    * 이 경우 run_standalone.sh 를 한번 실행해서 options_standalone.json 을 생성한 뒤, 적절히 수정하고 다시 run_standalone.sh 를 실행하시면 됩니다.
+    * 이 경우 run\_standalone.sh 를 한번 실행해서 options\_standalone.json 을 생성한 뒤, 적절히 수정하고 다시 run\_standalone.sh 를 실행하시면 됩니다.
 
 ### 1. 준비 사항
 
@@ -69,7 +69,7 @@
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
     1. 설치 중 오류가 발생하면 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
 5. "START" 가 보이면, 시작하기 전에 "Configuration" 페이지에서 아래 설정을 구성 후 "SAVE" 를 누릅니다.
-    1. serial_mode (EW11 사용시 socket, 그 외의 경우 serial)
+    1. serial\_mode (EW11 사용시 socket, 그 외의 경우 serial)
     2. serial/port 혹은 socket/address
     3. mqtt/server: 위의 "브로커"와 같은 주소 입력
 6. "Info" 페이지로 돌아와서 "START" 로 시작합니다.
@@ -80,12 +80,12 @@
 
 * MQTT discovery를 지원하므로, yaml 파일을 장치마다 일일이 설정할 필요가 없습니다.
 * 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어 있어야 합니다.
-* MQTT 통합 구성요소에 "sds_wallpad" 기기가 생성되고 모든 엔티티가 등록됩니다.
-![엔티티 목록][images/entity_list.png]
+* MQTT 통합 구성요소에 "sds\_wallpad" 기기가 생성되고 모든 엔티티가 등록됩니다.
+![엔티티 목록](images/entity_list.png)
 
 ### 4. Lovelace 구성 예제
 
-![Lovelace 구성 예제][images/lovelace_example.png]
+![Lovelace 구성 예제](images/lovelace_example.png)
 * [설정 방법 보러가기](DOCS_LOVELACE.md)
 
 ## 설정
@@ -97,7 +97,7 @@
 
 #### `entrance_mode` (off / minimal / full)
 * full: 현관 스위치가 없거나 연결을 끊은 경우, 이 애드온이 완전한 현관 스위치로 동작합니다.
-* minimal: 현관 스위치가 있는 상황에서, 엘리베이터 호출이 필요한 경우만 강제로 끼워넣습니다. 성공률이 매우 낮아서 수십 초 이상 걸리는 경우도 있습니다. max_retry를 적절히 설정하세요.
+* minimal: 현관 스위치가 있는 상황에서, 엘리베이터 호출이 필요한 경우만 강제로 끼워넣습니다. 성공률이 매우 낮아서 수십 초 이상 걸리는 경우도 있습니다. max\_retry를 적절히 설정하세요.
 * off: 현관 스위치 관련 기능을 비활성화 합니다. 일반적인 월패드 애드온으로만 동작합니다.
 
 #### wallpad\_mode (on / off)
@@ -135,7 +135,7 @@
 * Mosquitto에 login이 필요하도록 설정하셨으면 (anonymous: false) true로 수정해 주세요.
 
 #### user, passwd
-* need_login이 true인 경우 Mosquitto의 아이디와 비밀번호를 적어주세요.
+* need\_login이 true인 경우 Mosquitto의 아이디와 비밀번호를 적어주세요.
 
 #### discovery (true / false)
 * false로 변경하면 HA에 장치를 자동으로 등록하지 않습니다. 필요한 경우만 변경하세요.
@@ -160,13 +160,13 @@
 * false로 설정하면 로그를 파일로 남기지 않습니다.
 * 로그는 매일 자정에 새 파일로 저장되며, 기존 로그는 파일명에 날짜를 붙여 7개까지 보관됩니다.
 
-#### filename (기본값: /share/sds_wallpad.log)
+#### filename (기본값: /share/sds\_wallpad.log)
 * 로그를 남길 경로와 파일 이름을 지정합니다.
 
 ## 지원
 
 * 정확한 지원을 위해서, 글을 쓰실 때 아래 사항들을 포함해 주세요.
-    * 실행 로그 (HA의 share 폴더에 최신 로그 파일 (날짜가 써있지 않은 sds_wallpad.log 파일) 이 있습니다)
+    * 실행 로그 (HA의 share 폴더에 최신 로그 파일 (날짜가 써있지 않은 sds\_wallpad.log 파일) 이 있습니다)
     * Configuration 페이지 내용 (MQTT broker password가 있으면 가려주세요)
 * 집마다 패킷이나 장치 구성이 다르므로, 해결을 위해 여러 번의 추가정보 확인 요청이 필요할 수 있습니다.
 
