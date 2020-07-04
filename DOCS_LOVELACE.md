@@ -20,6 +20,9 @@ homeassistant:
 
 ### 조명
 
+* 버튼의 개수는 집 환경에 맞추어 설정하시면 됩니다.
+* 예제로만 참고하시고 조명은 그냥 버튼 카드를 직접 만드시는게 더 빠릅니다.
+
 <details markdown="1">
 <summary>Lovelace 카드</summary>
 
@@ -306,7 +309,7 @@ type: vertical-stack
 
 ### 난방
 
-* HACS 에서 "slider-entity-row" frontend 추가해서 사용 하였습니다.
+* HACS 에서 ["slider-entity-row" frontend](https://github.com/thomasloven/lovelace-slider-entity-row) 추가해서 사용 하였습니다.
 
 <details markdown="1">
 <summary>Lovelace 카드</summary>
