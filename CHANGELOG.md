@@ -12,6 +12,7 @@ entity_id:
   - light.sds_light_2
   ...
 ```
+* 현관/공동현관 관련 기존 임시 구현 제거
 * 환기장치와 공동현관 문열림 관련 automation 샘플 YAML 제공
 * Lovelace 구성 예제 제공
 
