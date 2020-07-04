@@ -2,7 +2,7 @@
 
 ### 5
 
-* 가상 인터폰 등록해서 공동현관 문열림 기능 제공 ("intercom\_mode")
+* **가상 인터폰 등록해서 공동현관 문열림 기능 제공** ("intercom\_mode")
 * 모든 entity가 MQTT 통합 구성요소에 "sds\_wallpad" 기기로 등록되도록 추가
 * entrance\_mode가 full일 때 일괄소등 기능 제거: 필요 시 아래와 같이 개별 전등을 전부 끄는 서비스로 대체하세요.
 ```yaml
