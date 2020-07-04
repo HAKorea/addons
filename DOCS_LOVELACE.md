@@ -2,10 +2,12 @@
 
 ![Lovelace 구성 예제](images/lovelace_example.png)
 
-## 카드 추가
+## 적용 방법
+
+### 카드 추가
 * 카드 종류 목록 맨 밑의 "직접 작성" 을 누른 후, 카드 코드를 붙여넣으시면 됩니다.
 
-## YAML 추가
+### YAML 추가
 * 먼저 configuration.yaml 에 아래 내용이 없다면 추가해주세요.
 ```yaml
 homeassistant:
@@ -14,7 +16,9 @@ homeassistant:
 * 이후 yaml 파일을 다운받아서, configuration.yaml 파일이 있는 경로에 packages 폴더를 만들고 집어넣으시면 됩니다.
 * HA 재시작이 필요합니다.
 
-## 조명
+## 장치
+
+### 조명
 
 <details markdown="1">
 <summary>Lovelace 카드</summary>
@@ -72,7 +76,7 @@ type: vertical-stack
 ```
 </details>
 
-## 대기전력차단 플러그
+### 대기전력차단 플러그
 
 <details markdown="1">
 <summary>Lovelace 카드</summary>
@@ -236,7 +240,7 @@ type: vertical-stack
 
 </details>
 
-## 현관스위치, 공동현관 문열림
+### 현관스위치, 공동현관 문열림
 
 * Configuration 페이지에서 "entrance_mode: full", "intercom_mode: on" 설정해주셔야 사용 가능합니다.
 * YAML 파일: [다운로드](yaml/intercom.yaml)
@@ -297,7 +301,7 @@ type: vertical-stack
 
 </details>
 
-## 난방
+### 난방
 
 * HACS 에서 "slider-entity-row" frontend 추가해서 사용 하였습니다.
 
@@ -328,7 +332,7 @@ type: entities
 
 </details>
 
-## 환기
+### 환기
 
 * YAML 파일: [다운로드](yaml/intercom.yaml)
 
@@ -382,7 +386,7 @@ type: vertical-stack
 
 </details>
 
-## 에너지 사용량
+### 에너지 사용량
 
 <details markdown="1">
 <summary>Lovelace 카드</summary>
