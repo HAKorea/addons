@@ -73,8 +73,6 @@ cards:
           action: toggle
         type: button
     type: horizontal-stack
-  - height: 20
-    type: 'custom:gap-card'
 type: vertical-stack
 ```
 </details>
@@ -305,8 +303,6 @@ cards:
         tap_action:
           action: toggle
         type: button
-  - height: 20
-    type: 'custom:gap-card'
 type: vertical-stack
 ```
 
@@ -390,8 +386,6 @@ cards:
           action: toggle
         type: button
     type: horizontal-stack
-  - height: 20
-    type: 'custom:gap-card'
 type: vertical-stack
 ```
 
