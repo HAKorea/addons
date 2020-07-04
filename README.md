@@ -50,7 +50,7 @@
 ## 설치
 
 * 환경 구성에 지식이 있다면 애드온이 아닌 standalone으로도 사용하실 수 있도록 준비해 두었습니다.
-    * 이 경우 options\_example.json 을 options\_standalone.json 으로 복사해서 작성하신 뒤 run_standalone.sh 를 실행하시면 됩니다.
+    * 이 경우 run_standalone.sh 를 한번 실행해서 options_standalone.json 을 생성한 뒤, 적절히 수정하고 다시 run_standalone.sh 를 실행하시면 됩니다.
 
 ### 1. 준비 사항
 

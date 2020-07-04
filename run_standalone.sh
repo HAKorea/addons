@@ -2,7 +2,7 @@
 
 ADDON_FILE=sds_wallpad.py
 OPTION_FILE=options_standalone.json
-EXAMPLE_FILE=options_example.json
+GENERATE_OPTION_SCRIPT=generate_options_standalone.py
 
 if which sudo >/dev/null; then
 	SUDO=sudo
@@ -23,8 +23,9 @@ python3 -m pip install pyserial
 python3 -m pip install paho-mqtt
 
 if [ ! -f $OPTION_FILE ]; then
-	echo "copy $EXAMPLE_FILE to $OPTION_FILE! you should edit $OPTION_FILE from now on."
-	cp $EXAMPLE_FILE $OPTION_FILE
+	python3 $GENERATE_OPTION_SCRIPT $OPTION_FILE
+	echo "$OPTION_FILE is generated! please modify it then start this script again."
+	exit 1
 fi
 
 python3 $ADDON_FILE $OPTION_FILE
