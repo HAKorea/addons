@@ -2,7 +2,7 @@
 	"serial_mode": "serial",
 	"entrance_mode": "off",
 	"wallpad_mode": "on",
-	"doorbell_mode": "off",
+	"intercom_mode": "off",
 	"serial": {
 		"port":  "/dev/ttyUSB0",
 		"baudrate": 9600,
