@@ -1,6 +1,6 @@
 # Lovelace 구성 예제 코드
 
-![Lovelace 구성 예제][images/lovelace_example.png]
+![Lovelace 구성 예제](images/lovelace_example.png)
 
 ## 카드 추가
 * 카드 종류 목록 맨 밑의 "직접 작성" 을 누른 후, 카드 코드를 붙여넣으시면 됩니다.
@@ -70,9 +70,10 @@ cards:
     type: 'custom:gap-card'
 type: vertical-stack
 ```
+</details>
 
 ## 대기전력차단 플러그
-</details>
+
 <details markdown="1">
 <summary>Lovelace 카드</summary>
 
