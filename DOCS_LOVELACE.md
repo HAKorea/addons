@@ -242,8 +242,11 @@ type: vertical-stack
 
 ### 현관스위치, 공동현관 문열림
 
-* Configuration 페이지에서 "entrance_mode: full", "intercom_mode: on" 설정해주셔야 사용 가능합니다.
 * YAML 파일: [다운로드](yaml/intercom.yaml)
+* Configuration 페이지에서 "entrance_mode: full", "intercom_mode: on" 설정해주셔야 사용 가능합니다.
+* 엘리베이터 호출 버튼이나 가스차단 버튼을 눌러서 켜면, 호출에 성공했거나 제한 시간이 다 되어 실패했을 때 꺼집니다.
+* 문열림 버튼은 초인종이 울렸을 때만 활성화됩니다.
+    * 예약 버튼을 켜두면 초인종이 울렸을 때 한번만 자동으로 문이 열립니다.
 
 <details markdown="1">
 <summary>Lovelace 카드</summary>
