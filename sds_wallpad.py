@@ -637,6 +637,8 @@ def mqtt_on_connect(mqtt, userdata, flags, rc):
 
 def mqtt_on_disconnect(mqtt, userdata, rc):
     logger.warning("MQTT disconnected! ({})".format(rc))
+    global mqtt_connected
+    mqtt_connected = False
 
 
 def start_mqtt_loop():
@@ -991,7 +993,7 @@ def serial_loop():
 
         # 인터폰 availability 관련 헤더인지 확인
         if header in virtual_avail:
-            virtual_enable(header)
+            virtual_enable(header_0, header_1)
 
         # 가상 장치로써 응답해야 할 header인지 확인
         if header_0 in header_0_virtual:
