@@ -1,5 +1,5 @@
 {
-	"version": "5.1",
+	"version": "5.2",
 	"slug": "sds_wallpad",
 	"name": "Samsung SDS RS485 Addon with Elevator Call",
 	"description": "삼성 SDS 월패드용 애드온입니다. 엘리베이터 호출 및 가스밸브 차단 기능을 제공합니다.",
