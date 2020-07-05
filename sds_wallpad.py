@@ -776,7 +776,7 @@ def virtual_clear(header):
     # 다음 트리거로 이어지면 추가
     if triggers[trigger]["next"] != None:
         next_trigger = triggers[trigger]["next"]
-        virtual_trigger[device][triggers[next_trigger]] = time.time()
+        virtual_trigger[device][next_trigger] = time.time()
 
 
 def serial_verify_checksum(packet):
