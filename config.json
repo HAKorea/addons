@@ -51,7 +51,7 @@
 		"serial_mode": "list(serial|socket)",
 		"entrance_mode": "list(full|minimal|off)",
 		"wallpad_mode": "list(on|off)",
-		"doorbell_mode": "list(on|off)",
+		"intercom_mode": "list?(on|off)",
 		"serial": {
 			"port":  "str",
 			"baudrate": "int",
