@@ -1,5 +1,9 @@
 ## 수정 내역
 
+#### 5.4
+
+* MQTT broker가 재시작했을 때, 재연결되면 다시 subscribe하도록 개선
+
 #### 5.3
 
 * intercom\_mode 설정 schema 추가
