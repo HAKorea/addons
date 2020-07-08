@@ -634,6 +634,16 @@ def mqtt_on_connect(mqtt, userdata, flags, rc):
     else:
         logger.error("MQTT connection return with:  {}".format(connack_string(rc)))
 
+    prefix = Options["mqtt"]["prefix"]
+    if Options["entrance_mode"] != "off" or Options["intercom_mode"] != "off":
+        topic = "{}/virtual/+/+/command".format(prefix)
+        logger.info("subscribe {}".format(topic))
+        mqtt.subscribe(topic, 0)
+    if Options["wallpad_mode"] != "off":
+        topic = "{}/+/+/+/command".format(prefix)
+        logger.info("subscribe {}".format(topic))
+        mqtt.subscribe(topic, 0)
+
 
 def mqtt_on_disconnect(mqtt, userdata, rc):
     logger.warning("MQTT disconnected! ({})".format(rc))
@@ -657,16 +667,6 @@ def start_mqtt_loop():
         logger.info("waiting MQTT connected ...")
         time.sleep(delay)
         delay = min(delay * 2, 10)
-
-    prefix = Options["mqtt"]["prefix"]
-    if Options["entrance_mode"] != "off" or Options["intercom_mode"] != "off":
-        topic = "{}/virtual/+/+/command".format(prefix)
-        logger.info("subscribe {}".format(topic))
-        mqtt.subscribe(topic, 0)
-    if Options["wallpad_mode"] != "off":
-        topic = "{}/+/+/+/command".format(prefix)
-        logger.info("subscribe {}".format(topic))
-        mqtt.subscribe(topic, 0)
 
 
 def virtual_enable(header_0, header_1):
