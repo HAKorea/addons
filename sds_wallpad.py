@@ -284,7 +284,6 @@ mqtt = paho_mqtt.Client()
 mqtt_connected = False
 
 logger = logging.getLogger(__name__)
-formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%H:%M:%S")
 
 
 class SDSSerial:
@@ -386,6 +385,7 @@ class SDSSocket:
 def init_logger():
     logger.setLevel(logging.INFO)
 
+    formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%H:%M:%S")
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     logger.addHandler(handler)
@@ -395,6 +395,8 @@ def init_logger_file():
     if Options["log"]["to_file"]:
         filename = Options["log"]["filename"]
         os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+        formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
         handler = TimedRotatingFileHandler(os.path.abspath(Options["log"]["filename"]), when="midnight", backupCount=7)
         handler.setFormatter(formatter)
         handler.suffix = '%Y%m%d'
@@ -758,9 +760,6 @@ def virtual_query(header_0, header_1):
                 resp = bytes(ba)
 
             conn.send(resp)
-
-        else:
-            logger.warning("unknown header {:X}".format(header))
 
 
 def virtual_clear(header):
