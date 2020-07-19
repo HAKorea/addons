@@ -1,0 +1,4 @@
+options_standalone.json
+*.backup
+log/
+run.sh
