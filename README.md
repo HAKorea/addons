@@ -93,6 +93,7 @@ customfile: mygateway.js
 와 같이 설정하고 share/mygateway.js 파일을 넣어두면 애드온의 모든 설정을 무시하고 해당 파일로 nodejs를 실행합니다.
 로그창에 Initializing mygateway.js... 과 같이 이름이 표시됨
 
+
 ### JS 파일의 수정
 
 개인화 설정을 하려면 이 옵션을 사용합니다. 자동으로 설치하려면 사용하지 않아도 됩니다. 
