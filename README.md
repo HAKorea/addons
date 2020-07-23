@@ -14,6 +14,12 @@
  기본적으로 코맥스로 동작하며 커스터마이징이 가능한 애드온으로 다른 아파트 nodejs 파일을 사용할 수 있습니다. 
  현재 삼성, 대림, 코맥스, 현대 월패드를 지원하면 ew11 같은 무선 소켓 연결도 지원합니다. 
 
+### Samsung SDS Wallpad RS485 Addon (sds_wallpad)
+
+ 저장장치님이 만든 삼성SDS 월패드 파이썬 애드온입니다.
+ 조명, 난방, 환기 등 장치들이 HA에 구성요소로 자동으로 등록되며,
+ 유선 연결 시에는 엘리베이터 호출과 공동현관 문열림을 안정적으로 지원합니다.
+ 
 ### USB Video Connector Addon with Motion Server (motion4hassio)
 
  웹캠이나 USB 카메라를 mjpeg motion server를 통해 HA에 통합 가능한 애드온입니다.
