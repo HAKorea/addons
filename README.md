@@ -64,7 +64,9 @@
 ### 2. 애드온 설치, 실행
 
 1. 홈어시스턴트의 Supervisor --> Add-on store에서 우상단 메뉴( ⋮ ) 를 누른 후 "repositories" 선택합니다.
-2. "Add repository" 영역에 "https://github.com/n-andflash/ha_addons/" 입력 후 ADD 를 누릅니다.
+2. "Add repository" 영역에 아래 주소 중 한 개를 입력 후 ADD 를 누릅니다.
+    1. 홈어시스턴트 카페 통합 저장소: https://github.com/HAKorea/addons
+    2. 애드온 개발자 개인 저장소: https://github.com/n-andflash/ha_addons
 3. 하단에 나타난 "Samsung SDS RS485 Addon with Elevator Call" 을 선택합니다.
 4. "INSTALL" 버튼을 누른 후 "START" 가 나타날 때까지 기다립니다. (수 분 이상 걸릴 수 있습니다)
     1. 설치 중 오류가 발생하면 Supervisor -> System 의 System log 최하단을 확인해봐야 합니다.
