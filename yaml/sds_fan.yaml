@@ -6,7 +6,7 @@ switch:
       fan_off:
         friendly_name: "환기"
         icon_template: mdi:circle-off-outline
-        value_template: "{{ states.fan.sds_fan_1.state == 'off' }}"
+        value_template: "{{ is_state('fan.sds_fan_1', 'off') }}"
         turn_on:
           service: fan.turn_off
           data:
@@ -18,7 +18,7 @@ switch:
       fan_low:
         friendly_name: "1단"
         icon_template: mdi:circle-slice-3
-        value_template: "{{ states.fan.sds_fan_1.state == 'on' and states.fan.sds_fan_1.attributes.speed == 'low' }}"
+        value_template: "{{ is_state('fan.sds_fan_1', 'on') and is_state_attr('fan.sds_fan_1', 'speed', 'low') }}"
         turn_on:
           - service: fan.turn_on
             data:
@@ -34,7 +34,7 @@ switch:
       fan_medium:
         friendly_name: "2단"
         icon_template: mdi:circle-slice-5
-        value_template: "{{ states.fan.sds_fan_1.state == 'on' and states.fan.sds_fan_1.attributes.speed == 'medium' }}"
+        value_template: "{{ is_state('fan.sds_fan_1', 'on') and is_state_attr('fan.sds_fan_1', 'speed', 'medium') }}"
         turn_on:
           - service: fan.turn_on
             data:
@@ -50,7 +50,7 @@ switch:
       fan_high:
         friendly_name: "3단"
         icon_template: mdi:circle-slice-7
-        value_template: "{{ states.fan.sds_fan_1.state == 'on' and states.fan.sds_fan_1.attributes.speed == 'high' }}"
+        value_template: "{{ is_state('fan.sds_fan_1', 'on') and is_state_attr('fan.sds_fan_1', 'speed', 'high') }}"
         turn_on:
           - service: fan.turn_on
             data:
