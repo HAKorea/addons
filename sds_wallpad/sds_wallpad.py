@@ -466,7 +466,7 @@ def init_virtual_device():
         })
 
         # availability 관련
-        for header_1 in (0x31, 0x32, 0x36):
+        for header_1 in (0x31, 0x32, 0x36, 0x3E):
             virtual_avail.append((VIRTUAL_DEVICE["intercom"]["header0"] << 8) + header_1)
 
 
@@ -685,7 +685,7 @@ def virtual_enable(header_0, header_1):
         topic = "{}/virtual/intercom/private/available".format(prefix)
         logger.info("doorlock status: {} = {}".format(topic, payload))
         mqtt.publish(topic, payload)
-    elif header_1 == 0x36:
+    elif header_1 == 0x36 or header_1 == 0x3E:
         payload = "offline"
         topic = "{}/virtual/intercom/public/available".format(prefix)
         logger.info("doorlock status: {} = {}".format(topic, payload))
