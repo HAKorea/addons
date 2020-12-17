@@ -28,7 +28,12 @@ robwolff3가 만든 구글 어시스턴트 웹서버를 애드온으로 컨버�
 구글 어시스턴트를 HA에서 텍스트 명령으로 컨트롤 할 수 있는 스위치, 자동화 등을 제작할 수 있습니다. 
 자세한 사용법은 [네이버 Homeassistant 카페 설정기](https://cafe.naver.com/koreassistant/661)를 참고하세요.
 
+### 삼성SDS 월패드 RS485 Add-on (엘리베이터 호출 지원)
 
+n-andFlash님이 만든 SDS월패드 애드온입니다. 
+삼성SDS 월패드를 사용하는 집에서, RS485를 이용해 여러 장치들을 제어할 수 있는 애드온입니다.
+현관 스위치를 대신하여 엘리베이터를 호출하는 기능이 있습니다.
+MQTT discovery를 이용, 장치별로 yaml 파일을 직접 작성하지 않아도 집에 있는 모든 장치가 HA에 자동으로 추가됩니다.
  
 ### 문의
 네이버카페 : https://cafe.naver.com/koreassistant
