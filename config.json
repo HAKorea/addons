@@ -1,6 +1,6 @@
 {
   "name": "Google Assistant Web Server for hassio",
-  "version": "0.5.5",
+  "version": "0.5.2",
   "slug": "gawebserver",
   "description": "Addon version of robwolff3 GA Webserver",
   "arch": [
