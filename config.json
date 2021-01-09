@@ -1,0 +1,30 @@
+{
+  "name": "Webdav addon",
+  "version": "0.5.0",
+  "slug": "webdav",
+  "description": "Webdav addon for Hassio",
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
+  "map": [
+    "share:rw"
+  ],
+  "url": "https://github.com/HAKorea/addons",
+  "startup": "application",
+  "boot": "auto",
+  "options": {
+    "username": "",
+    "password": ""
+  },
+  "schema": {
+    "username": "str",
+    "password": "str"
+  },
+ "ports": {
+    "80/tcp": 5515
+  } 
+}
