@@ -29,7 +29,7 @@ nginx reverse proxy 작성
 
 /share/nginx_proxy_default.conf 파일에 아래 내용을 추가하면 
 mydomain.duckdns.org/webdev 로 접근가능합니다. 
-
+```
 location /webdav {                                    
      proxy_pass http://homeassistant.local.hass.io:5515;
      proxy_set_header Host $host;                
