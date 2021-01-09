@@ -11,6 +11,8 @@ if [ ! -d $WEBDAV_PATH ]; then
 	echo "[Info] making directory /share/webdav/"
 	mkdir $WEBDAV_PATH
 	chown www-data $WEBDAV_PATH && chmod -R 777 $WEBDAV_PATH
+else
+	echo "[Info] webdev directory aleady exist. using /share/webdev dir."
 fi
 
 if [[ -n "$USERNAME" ]] && [[ -n "$USERPWD" ]]; then

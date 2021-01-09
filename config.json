@@ -1,8 +1,8 @@
 {
-  "name": "Webdav addon",
+  "name": "Webdav addon for file storage HA Supervised",
   "version": "0.5.0",
-  "slug": "webdav",
-  "description": "Webdav addon for Hassio",
+  "slug": "ha_webdav",
+  "description": "Webdav addon for HA Supervised",
   "arch": [
     "armhf",
     "armv7",

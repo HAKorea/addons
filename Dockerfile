@@ -28,7 +28,7 @@ proxy_request_buffering off;\n\
 RUN ln -s /etc/nginx/sites-available/webdav /etc/nginx/sites-enabled/webdav
 RUN rm -rf /etc/nginx/sites-enabled/default
 
-COPY entrypoint.sh /
-RUN chmod +x entrypoint.sh
+COPY run.sh /
+RUN chmod +x run.sh
 
-CMD /entrypoint.sh && nginx -g "daemon off;"
+CMD /run.sh && nginx -g "daemon off;"
