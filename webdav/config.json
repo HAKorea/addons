@@ -1,5 +1,5 @@
 {
-  "name": "Webdav addon for file storage HA Supervised",
+  "name": "Webdav addon for file storage in HA Supervised",
   "version": "0.5.0",
   "slug": "ha_webdav",
   "description": "Webdav addon for HA Supervised",
