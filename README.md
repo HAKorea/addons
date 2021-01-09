@@ -50,7 +50,6 @@ chown www-data:www-data photo
 mydomain.duckdns.org/webdev/photo
 ```
 를 적으시면 됩니다. 
-```
 
 ## RELEASE NOTES
 2021.01.10 첫번째 배포
