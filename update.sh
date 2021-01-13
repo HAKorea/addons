@@ -16,12 +16,19 @@ for i in ${DIRS};do
 
         array_check=`in_array $i ${READTREE_REPO[@]}`
         if [ "${array_check}" == "true" ]; then
-	      	echo `rm -rf $i` 
-		echo `git add -A`
-		echo `git commit -m $i" deleted"`	
-              	echo `git read-tree --prefix=$i -u $i:$i`
-		echo `git commit -m $i" refreshed"`	
-              	echo "read-tree"
+
+		result=`git diff $i/master:$i/README.md $i/README.md`
+
+		if [[ -n $result ]];then
+	      		echo `rm -rf $i` 
+			echo `git add -A`
+			echo `git commit -m $i" deleted"`	
+              		echo `git read-tree --prefix=$i -u $i:$i`
+			echo `git commit -m $i" refreshed"`	
+              		echo "read-tree"
+		else
+			echo "NO UPDATE"
+		fi
         else
               	echo `git subtree pull --prefix=$i $i master`
               	echo "subtree"
