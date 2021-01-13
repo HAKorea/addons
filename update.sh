@@ -25,13 +25,13 @@ for i in ${DIRS};do
 			echo `git commit -m $i" deleted"`	
               		echo `git read-tree --prefix=$i -u $i:$i`
 			echo `git commit -m $i" refreshed"`	
-              		echo "read-tree"
+              		echo -e "<<<<<<<<<<<<<<<<<<< read-tree\n"
 		else
-			echo "NO UPDATE"
+			echo -e ">>>>>>>>>>>>>>>>>>> NO UPDATE\n"
 		fi
         else
               	echo `git subtree pull --prefix=$i $i master`
-              	echo "subtree"
+              	echo -e "<<<<<<<<<<<<<<<<<<< subtree\n"
         fi
 done
 
