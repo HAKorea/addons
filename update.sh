@@ -16,7 +16,8 @@ for i in ${DIRS};do
 
         array_check=`in_array $i ${READTREE_REPO[@]}`
         if [ "${array_check}" == "true" ]; then
-#               echo `git read-tree --prefix=sds_wallpad -u sds_wallpad:sds_wallpad`
+#	       echo `rm -rf $i` 
+#              echo `git read-tree --prefix=$i -u $i:$i`
                echo "read-tree"
         else
                echo `git subtree pull --prefix=$i $i master`
