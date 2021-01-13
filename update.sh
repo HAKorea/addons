@@ -20,6 +20,7 @@ for i in ${DIRS};do
 		echo `git add -A`
 		echo `git commit -m $i" deleted"`	
               	echo `git read-tree --prefix=$i -u $i:$i`
+		echo `git commit -m $i" refreshed"`	
               	echo "read-tree"
         else
               	echo `git subtree pull --prefix=$i $i master`
