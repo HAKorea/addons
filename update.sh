@@ -17,7 +17,7 @@ for i in ${DIRS};do
         array_check=`in_array $i ${READTREE_REPO[@]}`
         if [ "${array_check}" == "true" ]; then
 
-		result=`git diff $i/master:$i/README.md $i/README.md`
+		result=`git diff $i/master:$i/config.json $i/config.json`
 
 		if [[ -n $result ]];then
 	      		echo `rm -rf $i` 
