@@ -12,7 +12,7 @@ https://github.com/robwolff3/google-assistant-webserver
 robwolff3가 만든 구글 어시스턴트 웹서버를 애드온으로 컨버팅한 것입니다. 
 자세한 사용법은 [네이버 Homeassistant 카페](https://cafe.naver.com/koreassistant/661) 설정기를 참고하세요. 
 
-## Version : 0.5.3
+## Version : 0.5.2
 - aarch64 추가:라즈4 64bit - 현재 동작하지 않습니다. [ 참고 ](https://cafe.naver.com/koreassistant/3285)
 - asoundrc 추가
 
