@@ -1,6 +1,6 @@
 {
   "name": "USB Video Connector Addon",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "slug": "motion",
   "description": "Using WebCam or USB Video Capture Device with Motion Server",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
@@ -14,7 +14,7 @@
   "map": [
     "config:rw"
   ],
-  "devices": ["/dev/video0:/dev/video0:rwm"],
+  "devices": ["/dev/video0"],
   "options": {
   	"videodevice": "/dev/video0",
   	"width": 720,
