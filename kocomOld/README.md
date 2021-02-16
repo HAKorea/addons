@@ -3,7 +3,7 @@
 ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield]
 
 ## About
-랜이님이 만든 코콤 월패드 프로그램을 애드온으로 만든 것입니다.
+시놀로지 구버전 supervisor 2021.1 버전용 config.json auto_uart 버전입니다.
 
 ## Version : 1.1.0
 - alpine linux images를 python3 이미지로 교체
