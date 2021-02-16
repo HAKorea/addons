@@ -5,8 +5,7 @@
 ## About
 랜이님이 만든 코콤 월패드 프로그램을 애드온으로 만든 것입니다.
 
-## Version : 1.1.1
-- auto_uart deprecated. change to uart config
+## Version : 1.1.0
 - alpine linux images를 python3 이미지로 교체
 - CPU 최적화 및 딜레이 수정
 
