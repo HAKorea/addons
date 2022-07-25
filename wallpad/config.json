@@ -16,7 +16,7 @@
   "url": "https://github.com/HAKorea/addons",
   "startup": "application",
   "boot": "auto",
-  "auto_uart": true,
+  "uart": true,
   "options": {
     "model":"commax",
     "type": "serial",
