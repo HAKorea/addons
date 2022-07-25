@@ -5,6 +5,7 @@
   "description": "Using WebCam or USB Video Capture Device with Motion Server",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "url": "https://github.com/HAKorea/addons",
+  "init": false,
   "startup": "application",
   "boot": "auto",
   "ports": {
