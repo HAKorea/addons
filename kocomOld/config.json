@@ -1,0 +1,177 @@
+{
+  "name": "Kocom Wallpad Controller for Synology Old Version",
+  "version": "1.1.0",
+  "slug": "kocom_wallpad_old",
+  "description": "구버전 코콤 월패드 컨트롤러입니다",
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
+  "url": "https://github.com/HAKorea/addons",
+  "startup": "application",
+  "boot": "auto",
+  "auto_uart": true,
+  "map": [
+    "share:rw"
+  ],
+  "options": {
+    "RS485": {
+      "type": "Serial"
+    },
+    "Socket": {
+      "server": "192.168.x.x",
+      "port": 8899
+    },
+    "SocketDevice": {
+      "device": "kocom"
+    },
+    "Serial": {
+      "port1": "/dev/ttyUSB0"
+    },
+    "SerialDevice": {
+      "port1": "kocom"
+    },
+    "MQTT": {
+      "anonymous": false,
+      "server": "192.168.x.x",
+      "username": "id",
+      "password": "pw"
+    },
+    "Wallpad": {
+      "light": false,
+      "plug": false,
+      "thermostat": false,
+      "fan": false,
+      "gas": false,
+      "elevator": false
+    },
+    "Advanced": {
+      "INIT_TEMP": 22,
+      "SCAN_INTERVAL": 300,
+      "SCANNING_INTERVAL": 0.8,
+      "DEFAULT_SPEED" : "medium",
+      "LOGLEVEL" : "info"
+    },
+    "KOCOM_LIGHT_SIZE": [
+      {
+        "name": "livingroom",
+        "number": 3
+      },
+      {
+        "name": "bedroom",
+        "number": 2
+      },
+      {
+        "name": "room1",
+        "number": 2
+      },
+      {
+        "name": "room2",
+        "number": 2
+      },
+      {
+        "name": "kitchen",
+        "number": 3
+      }
+    ],
+    "KOCOM_PLUG_SIZE": [
+      {
+        "name": "livingroom",
+        "number": 3
+      },
+      {
+        "name": "bedroom",
+        "number": 2
+      },
+      {
+        "name": "room1",
+        "number": 2
+      },
+      {
+        "name": "room2",
+        "number": 2
+      },
+      {
+        "name": "kitchen",
+        "number": 3
+      }
+    ],
+    "KOCOM_ROOM": [
+      "livingroom",
+      "bedroom",
+      "room1",
+      "room2",
+      "kitchen"
+    ],
+    "KOCOM_ROOM_THERMOSTAT": [
+      "livingroom",
+      "bedroom",
+      "room1",
+      "room2"
+    ]
+  },
+  "schema": {
+    "RS485": {
+      "type": "list(Serial|Socket)"
+    },
+    "Socket": {
+      "server": "str?",
+      "port": "int?"
+    },
+    "SocketDevice": {
+      "device": "str?"
+    },
+    "Serial": {
+      "port1": "str?",
+      "port2": "str?",
+      "port3": "str?"
+    },
+    "SerialDevice": {
+      "port1": "str?",
+      "port2": "str?",
+      "port3": "str?"
+    },
+    "MQTT": {
+      "anonymous": "bool",
+      "server": "str",
+      "username": "str",
+      "password": "str"
+    },
+    "Wallpad": {
+      "light": "bool",
+      "plug": "bool",
+      "thermostat": "bool",
+      "fan": "bool",
+      "gas": "bool",
+      "elevator": "bool"
+    },
+    "Advanced": {
+      "INIT_TEMP": "int(10,30)",
+      "SCAN_INTERVAL": "int(100,1000)",
+      "SCANNING_INTERVAL": "float",
+      "DEFAULT_SPEED" : "str",
+      "LOGLEVEL" : "str"
+    },
+    "KOCOM_LIGHT_SIZE": [
+      {
+        "name": "str?",
+        "number": "int?"
+      }
+    ],
+    "KOCOM_PLUG_SIZE": [
+      {
+        "name": "str?",
+        "number": "int?"
+      }
+    ],
+    "KOCOM_ROOM": [
+      "str?"
+    ],
+    "KOCOM_ROOM_THERMOSTAT": [
+      "str?"
+    ]
+  }
+}

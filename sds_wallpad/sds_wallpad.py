@@ -10,6 +10,7 @@ import time
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os.path
+import re
 
 ####################
 VIRTUAL_DEVICE = {
@@ -79,7 +80,9 @@ VIRTUAL_DEVICE = {
         "trigger": {
             "public":  { "ack": 0x36, "ON": 0xB0360204, "next": ("public2", "ON"), }, # 통화 시작
             "public2": { "ack": 0x3B, "ON": 0xB03B010A, "next": ("end", "ON"), }, # 문열림
-            "private": { "ack": 0x35, "ON": 0xB0380008, "next": ("privat2", "ON"), }, # 현관 영상통화 시작
+            "priv_a":  { "ack": 0x36, "ON": 0xB0360107, "next": ("privat2", "ON"), }, # 현관 통화 시작 (초인종 울렸을 때)
+            "priv_b":  { "ack": 0x35, "ON": 0xB0380008, "next": ("privat2", "ON"), }, # 현관 통화 시작 (평상시)
+            "private": { "ack": 0x35, "ON": 0xB0380008, "next": ("privat2", "ON"), }, # 현관 통화 시작 (평상시)
             "privat2": { "ack": 0x3B, "ON": 0xB03B000B, "next": ("end", "ON"), }, # 현관 문열림
             "end":     { "ack": 0x3E, "ON": 0xB0420072, "next": None, }, # 문열림 후, 통화 종료 알려줄때까지 통화상태로 유지
         },
@@ -424,7 +427,7 @@ class SDSSocket:
     def recv(self, count=1):
         # socket은 버퍼와 in_waiting 직접 관리
         if len(self._recv_buf) < count:
-            new_data = self._recv_raw(1024)
+            new_data = self._recv_raw(256)
             self._recv_buf.extend(new_data)
         if len(self._recv_buf) < count:
             return None
@@ -445,6 +448,9 @@ class SDSSocket:
         return self._pending_recv
 
     def check_in_waiting(self):
+        if len(self._recv_buf) == 0:
+            new_data = self._recv_raw(256)
+            self._recv_buf.extend(new_data)
         return len(self._recv_buf)
 
     def set_timeout(self, a):
@@ -505,6 +511,11 @@ def init_option(argv):
                 logger.warning("no configuration value for '{}'! try default value ({})...".format(k, Options[k]))
             else:
                 Options[k] = Options2[k]
+
+    # 관용성 확보
+    Options["mqtt"]["server"] = re.sub("[a-z]*://", "", Options["mqtt"]["server"])
+    if Options["mqtt"]["server"] == "127.0.0.1":
+        logger.warning("MQTT server address should be changed!")
 
     # internal options
     Options["mqtt"]["_discovery"] = Options["mqtt"]["discovery"]
@@ -758,13 +769,20 @@ def mqtt_on_disconnect(mqtt, userdata, rc):
 
 
 def start_mqtt_loop():
+    logger.info("initialize mqtt...")
+
     mqtt.on_message = mqtt_on_message
     mqtt.on_connect = mqtt_on_connect
     mqtt.on_disconnect = mqtt_on_disconnect
 
     if Options["mqtt"]["need_login"]:
         mqtt.username_pw_set(Options["mqtt"]["user"], Options["mqtt"]["passwd"])
-    mqtt.connect(Options["mqtt"]["server"], Options["mqtt"]["port"])
+
+    try:
+        mqtt.connect(Options["mqtt"]["server"], Options["mqtt"]["port"])
+    except Exception as e:
+        logger.error("MQTT server address/port may be incorrect! ({})".format(str(e)))
+        sys.exit(1)
 
     mqtt.loop_start()
 
@@ -784,11 +802,14 @@ def virtual_enable(header_0, header_1):
         topic = "{}/virtual/intercom/public/available".format(prefix)
         logger.info("doorlock status: {} = {}".format(topic, payload))
         mqtt.publish(topic, payload)
+
     elif header_1 == 0x31:
         payload = "online"
         topic = "{}/virtual/intercom/private/available".format(prefix)
         logger.info("doorlock status: {} = {}".format(topic, payload))
         mqtt.publish(topic, payload)
+        VIRTUAL_DEVICE["intercom"]["trigger"]["private"] = VIRTUAL_DEVICE["intercom"]["trigger"]["priv_a"]
+
     elif header_1 == 0x36 or header_1 == 0x3E:
         payload = "offline"
         topic = "{}/virtual/intercom/public/available".format(prefix)
@@ -797,6 +818,7 @@ def virtual_enable(header_0, header_1):
         topic = "{}/virtual/intercom/private/available".format(prefix)
         logger.info("doorlock status: {} = {}".format(topic, payload))
         mqtt.publish(topic, payload)
+        VIRTUAL_DEVICE["intercom"]["trigger"]["private"] = VIRTUAL_DEVICE["intercom"]["trigger"]["priv_b"]
 
 
 def virtual_pop(device, trigger, cmd):
@@ -1185,6 +1207,10 @@ def dump_loop():
     dump_time = Options["rs485"]["dump_time"]
 
     if dump_time > 0:
+        if dump_time < 10:
+            logger.warning("dump_time is too short! automatically changed to 10 seconds...")
+            dump_time = 10
+
         start_time = time.time()
         logger.warning("packet dump for {} seconds!".format(dump_time))
 
@@ -1192,7 +1218,7 @@ def dump_loop():
         logs = []
         while time.time() - start_time < dump_time:
             try:
-                data = conn.recv(1024)
+                data = conn.recv(256)
             except:
                 continue
 

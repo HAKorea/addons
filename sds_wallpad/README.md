@@ -14,7 +14,7 @@
 
 ## 소개
 
-* [버전별 변경 사항](CHANGELOG.md)
+* [버전별 변경 사항](https://github.com/n-andflash/ha_addons/blob/master/sds_wallpad/CHANGELOG.md)
 
 * 삼성SDS 월패드를 사용하는 집에서, RS485를 이용해 여러 장치들을 제어할 수 있는 애드온입니다.
 * 현관 스위치를 대신하여 엘리베이터를 호출하는 기능이 있습니다.
@@ -86,12 +86,12 @@
 * MQTT discovery를 지원하므로, yaml 파일을 장치마다 일일이 설정할 필요가 없습니다.
     * 통합 구성요소 페이지에 MQTT가 있고, [ ⋮ ] 를 클릭했을 때 "새로 추가된 구성요소를 활성화" 되어 있어야 합니다.
 * MQTT 통합 구성요소에 "sds\_wallpad" 기기가 생성되고 모든 엔티티가 등록됩니다.
-![엔티티 목록](images/entity_list.png)
+![엔티티 목록](https://github.com/n-andflash/ha_addons/raw/master/sds_wallpad/images/entity_list.png)
 
 ### 4. Lovelace 구성 예제
 
-![Lovelace 구성 예제](images/lovelace_example.png)
-* [설정 방법 보러가기](DOCS_LOVELACE.md)
+![Lovelace 구성 예제](https://github.com/n-andflash/ha_addons/raw/master/sds_wallpad/images/lovelace_example.png)
+* [설정 방법 보러가기](https://github.com/n-andflash/ha_addons/blob/master/sds_wallpad/DOCS_LOVELACE.md)
 * 월패드에 연결되지 않은 기능은 사용하실 수 없습니다.
 
 ## 설정
@@ -190,18 +190,18 @@
 
 [Github issue 페이지 (버그 신고, 수정 제안 등)](https://github.com/n-andflash/ha_addons/issues)
 
-[삼성SDS 월패드 RS485 패킷 분석](DOCS_PACKETS.md)
+[삼성SDS 월패드 RS485 패킷 분석](https://github.com/n-andflash/ha_addons/blob/master/sds_wallpad/DOCS_PACKETS.md)
 
 ## 면책조항 (Disclaimer)
 
 * 이 애드온은 무상으로 제공되므로 정확성이나 안정성 등 어떠한 보증도 제공하지 않습니다.
 * 이 애드온은 오픈소스로 실행 코드와 함께 배포되므로 코드 및 동작에 대한 확인 책임은 사용자에게 있습니다.
-* 기타 사항은 GPLv3를 따릅니다. [전문보기](LICENSE)
+* 기타 사항은 GPLv3를 따릅니다. [전문보기](https://github.com/n-andflash/ha_addons/raw/master/sds_wallpad/LICENSE)
 
 ---
 
-![카카오톡 기부 QR코드](https://github.com/n-andflash/ha_addons/raw/master/sds_wallpad/images/donation_kakao.png)
-* 카카오톡 기부 코드: https://qr.kakaopay.com/281006011000008548744237 (모바일에서만 가능)
+![카카오톡 후원 QR코드](https://github.com/n-andflash/ha_addons/raw/master/sds_wallpad/images/donation_kakao.png)
+* 카카오톡 후원 코드: https://qr.kakaopay.com/281006011000008548744237 (모바일에서만 가능)
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
