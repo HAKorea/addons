@@ -1,6 +1,6 @@
 {
   "name": "Google Assistant Web Server for hassio",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "slug": "gawebserver",
   "description": "Addon version of robwolff3 GA Webserver",
   "arch": [
@@ -12,7 +12,7 @@
   "map": [
     "share:rw"
   ],
-  "devices": ["/dev/snd:/dev/snd:rwm"],
+  "devices": ["/dev/snd"],
   "ports": {
     "9324/tcp": 9324,
     "5000/tcp": 5000
